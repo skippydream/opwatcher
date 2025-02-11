@@ -22,122 +22,19 @@ struct ContentView: View {
     
     var body: some View {
             VStack {
-                if commands {
-                   
-                                        
-                    HStack {
-                        // precedente episodio
-                        Button(action: {
-                            episode -= 1
-                        }) {
-                            Image(systemName: "arrow.backward.circle.fill") // Icona per "indietro"
-                        }
-                        .buttonStyle(.borderless)
-                        .font(.system(size: 65)) // Impostiamo la dimensione dell'icona
-                        .padding()
-                        Divider()
-                            .frame(height: 80)
+                if showPlayer {
+                    ZStack {
+                        EpisodePlayerView(episode: $episode,
+                                          isFullscreen: $isFullscreen,
+                                          fillerEpisodes: $fillerEpisodes,
+                                          mixedFillerEpisodes: $mixedFillerEpisodes,
+                                          lastWatchedEpisode: lastWatchedEpisode,
+                                          showPlayer: $showPlayer,
+                                          commands: $commands,
+                                          saveLastWatchedEpisode: saveLastWatchedEpisode)
                         
-                        // Carica l'ultimo episodio
-                        Button(action: {
-                            loadLastWatchedEpisode()
-                            episode = lastWatchedEpisode
-                            showPlayer = true
-                        }) {
-                            Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
-                            VStack {
-                                Text("Ep. salvato:")
-                                    .font(.caption)
-                                Text("\(lastWatchedEpisode)")
-                                    .font(.system(size: 30)) // Impostiamo la dimensione dell'icona
-                                    .foregroundColor(
-                                        mixedFillerEpisodes.contains(lastWatchedEpisode) ? Color.orange :
-                                            fillerEpisodes.contains(lastWatchedEpisode) ? Color.red :
-                                            Color.gray // Colore di default (bianco)
-                                    )
-                            }
-                            
-                        }
-                        .buttonStyle(.borderless)
-                        .disabled(true)
-                        .font(.system(size: 50)) // Impostiamo la dimensione dell'icona
-                        .padding()
-                        .opacity(0.8)
-
-                        
-      //                  Divider()
-      //                      .frame(height: 40)
-      //                  Button(action: {
-      //                      saveLastWatchedEpisode()
-      //                      lastWatchedEpisode = episode
-      //                  }) {
-       //                     Image(systemName: "square.and.arrow.down")
-       //                 }
-       //                 .buttonStyle(.borderless)
-      //                  .padding(.bottom, 5)
-      //                  .font(.system(size: 60)) // Impostiamo la dimensione dell'icona
-     //                   .padding()
-                        Divider()
-                            .frame(height: 30)
-                        
-                        
-                        //Cerca
-                        Button(action: {
-                            searchExpand.toggle() // Carica l'ultimo episodio
-                        }) {
-                            Image(systemName: "magnifyingglass.circle.fill")
-                                .opacity(0.4)
-
-                        }
-                        .buttonStyle(.borderless)
-                        .font(.system(size: 50)) // Impostiamo la dimensione dell'icona
-                        .padding()
-
-                        Divider()
-                            .frame(height: 30)
-                        
-                        //TextField
-                        Button(action: {
-                            
-                        }) {
-                            Image(systemName: "film.fill")
-                                .font(.system(size: 55))
-                            VStack {
-                                Text("Ep. attuale:")
-                                    .font(.caption)
-                                Text("\(episode)")
-                                    .font(.system(size: 30))
-                                    .foregroundColor(
-                                        mixedFillerEpisodes.contains(episode) ? Color.orange :
-                                            fillerEpisodes.contains(episode) ? Color.red :
-                                            Color.gray // Colore di default (bianco)
-                                    )
-                            }
-
-                        }
-                        .buttonStyle(.borderless)
-                        .disabled(true)
-                        .font(.system(size: 50)) // Impostiamo la dimensione dell'icona
-                        .padding()
-                        .opacity(0.8)
-
-                        
-                        Divider()
-                            .frame(height: 80)
-                        // prossimo episodio
-                        Button(action: {
-                            episode += 1
-                        }) {
-                            Image(systemName: "arrow.forward.circle.fill") // Icona per "indietro"
-                              
-                        }
-                        .buttonStyle(.borderless)
-                        .font(.system(size: 65)) // Impostiamo la dimensione dell'icona
-                        .padding()
-
                     }
-                    
-                    
+                    .background(Color.black)
                     
                     if searchExpand {
 
@@ -187,7 +84,7 @@ struct ContentView: View {
                                 )
                             }
                             .padding(.horizontal, 80)
-                            .padding(.bottom, 20)
+                            .padding(.top, 10)
                             .onAppear {
                                 // Quando il TextField appare, imposta il focus su di esso
                                 isInputFocused = true
@@ -198,26 +95,138 @@ struct ContentView: View {
                                 } else {
                                     isInputFocused = false  // Rimuovi il focus quando si nasconde
                                 }
+
                             }
 
                     }
 
-                }
-                if showPlayer {
-                    ZStack {
-                        EpisodePlayerView(episode: $episode,
-                                          isFullscreen: $isFullscreen,
-                                          fillerEpisodes: $fillerEpisodes,
-                                          mixedFillerEpisodes: $mixedFillerEpisodes,
-                                          lastWatchedEpisode: lastWatchedEpisode,
-                                          showPlayer: $showPlayer,
-                                          commands: $commands,
-                                          saveLastWatchedEpisode: saveLastWatchedEpisode)
-                        
-                    }
-                    .background(Color.black)
 
                 }
+                
+                if commands {
+                   
+                                        
+                    HStack {
+                        // precedente episodio
+                        Button(action: {
+                            episode -= 1
+                        }) {
+                            Image(systemName: "arrow.backward.circle.fill") // Icona per "indietro"
+                        }
+                        .buttonStyle(.borderless)
+                        .font(.system(size: 65)) // Impostiamo la dimensione dell'icona
+                        .padding(.horizontal, 30)
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        
+      //                  Divider()
+       //                     .frame(height: 60)
+                        
+                        // Carica l'ultimo episodio
+      //                  Button(action: {
+      //                     episode = lastWatchedEpisode
+                        //                      showPlayer = true
+                        //                  }) {
+                        //                       Image(systemName: "arrow.triangle.2.circlepath.circle.fill")
+                        //                       VStack {
+                        //                           Text("Ep. salvato:")
+                        //                              .font(.caption)
+                        //                          Text("\(lastWatchedEpisode)")
+                        //                              .font(.system(size: 30)) // Impostiamo la dimensione dell'icona
+                        //                             .foregroundColor(
+                        //                         mixedFillerEpisodes.contains(lastWatchedEpisode) ? Color.orange :
+                        //                               fillerEpisodes.contains(lastWatchedEpisode) ? Color.red :
+                        //                                 Color.gray // Colore di default (bianco)
+                        //                        )
+                        //                  }
+                    //
+                        //                }
+                    //                .buttonStyle(.borderless)
+                        //                .disabled(true)
+                        //                .font(.system(size: 50)) // Impostiamo la dimensione dell'icona
+                        //                .padding()
+                        //                .opacity(0.8)
+
+                        
+      //                  Divider()
+      //                      .frame(height: 40)
+      //                  Button(action: {
+      //                      saveLastWatchedEpisode()
+      //                      lastWatchedEpisode = episode
+      //                  }) {
+       //                     Image(systemName: "square.and.arrow.down")
+       //                 }
+       //                 .buttonStyle(.borderless)
+      //                  .padding(.bottom, 5)
+      //                  .font(.system(size: 60)) // Impostiamo la dimensione dell'icona
+     //                   .padding()
+         //               Divider()
+         //                   .frame(height: 30)
+                        
+                        
+                        //Cerca
+                        Button(action: {
+                            searchExpand.toggle() // Carica l'ultimo episodio
+                        }) {
+                            Image(systemName: "magnifyingglass.circle.fill")
+                                .opacity(0.4)
+
+                        }
+                        .buttonStyle(.borderless)
+                        .font(.system(size: 50)) // Impostiamo la dimensione dell'icona
+                        .padding()
+
+                        Divider()
+                            .frame(height: 30)
+                        
+                        //TextField
+                        Button(action: {
+                            
+                        }) {
+                            Image(systemName: "film.fill")
+                                .font(.system(size: 55))
+                            VStack {
+                                Text("Ep. attuale:")
+                                    .font(.caption)
+                                Text("\(episode)")
+                                    .font(.system(size: 30))
+                                    .foregroundColor(
+                                        mixedFillerEpisodes.contains(episode) ? Color.orange :
+                                            fillerEpisodes.contains(episode) ? Color.red :
+                                            Color.gray // Colore di default (bianco)
+                                    )
+                            }
+
+                        }
+                        .buttonStyle(.borderless)
+                        .disabled(true)
+                        .font(.system(size: 50)) // Impostiamo la dimensione dell'icona
+                        .padding()
+                        .opacity(0.8)
+
+                        
+             //           Divider()
+              //              .frame(height: 60)
+                        // prossimo episodio
+                        Button(action: {
+                            episode += 1
+                        }) {
+                            Image(systemName: "arrow.forward.circle.fill") // Icona per "indietro"
+                              
+                        }
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+
+                        .buttonStyle(.borderless)
+                        .font(.system(size: 65)) // Impostiamo la dimensione dell'icona
+                        .padding()
+                        .padding(.horizontal, 30)
+
+
+                    }
+                    .offset(y: -5)
+                    
+                }
+                
                 
             }
         
