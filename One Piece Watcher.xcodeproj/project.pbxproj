@@ -14,6 +14,9 @@
 		284ABD992D4DB83D0036B99B /* opwatcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284ABD982D4DB83D0036B99B /* opwatcherTests.swift */; };
 		284ABDA32D4DB83D0036B99B /* opwatcherUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284ABDA22D4DB83D0036B99B /* opwatcherUITests.swift */; };
 		284ABDA52D4DB83D0036B99B /* opwatcherUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284ABDA42D4DB83D0036B99B /* opwatcherUITestsLaunchTests.swift */; };
+		2899BD042D5104C800D92E8E /* EpisodePlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2899BD032D5104C800D92E8E /* EpisodePlayerView.swift */; };
+		28B537612D51D9AE00C05403 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28A4EFC02D50470800FFEC30 /* AVKit.framework */; };
+		28ED31612D54392300A79A14 /* AVPlayerViewRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28ED31602D54392300A79A14 /* AVPlayerViewRepresentable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,17 +37,20 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		284ABD832D4DB8390036B99B /* opwatcher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = opwatcher.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		284ABD832D4DB8390036B99B /* One Piece Watcher.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "One Piece Watcher.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		284ABD862D4DB8390036B99B /* opwatcherApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = opwatcherApp.swift; sourceTree = "<group>"; };
 		284ABD882D4DB8390036B99B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		284ABD8A2D4DB83C0036B99B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		284ABD8D2D4DB83C0036B99B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		284ABD8F2D4DB83C0036B99B /* opwatcher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = opwatcher.entitlements; sourceTree = "<group>"; };
-		284ABD942D4DB83D0036B99B /* opwatcherTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = opwatcherTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		284ABD942D4DB83D0036B99B /* One Piece WatcherTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "One Piece WatcherTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		284ABD982D4DB83D0036B99B /* opwatcherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = opwatcherTests.swift; sourceTree = "<group>"; };
-		284ABD9E2D4DB83D0036B99B /* opwatcherUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = opwatcherUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		284ABD9E2D4DB83D0036B99B /* One Piece WatcherUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "One Piece WatcherUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		284ABDA22D4DB83D0036B99B /* opwatcherUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = opwatcherUITests.swift; sourceTree = "<group>"; };
 		284ABDA42D4DB83D0036B99B /* opwatcherUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = opwatcherUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		2899BD032D5104C800D92E8E /* EpisodePlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodePlayerView.swift; sourceTree = "<group>"; };
+		28A4EFC02D50470800FFEC30 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
+		28ED31602D54392300A79A14 /* AVPlayerViewRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVPlayerViewRepresentable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +58,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				28B537612D51D9AE00C05403 /* AVKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -79,15 +86,18 @@
 				284ABD972D4DB83D0036B99B /* opwatcherTests */,
 				284ABDA12D4DB83D0036B99B /* opwatcherUITests */,
 				284ABD842D4DB8390036B99B /* Products */,
+				28A4EFBF2D50470800FFEC30 /* Frameworks */,
 			);
 			sourceTree = "<group>";
+			usesTabs = 0;
+			wrapsLines = 1;
 		};
 		284ABD842D4DB8390036B99B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				284ABD832D4DB8390036B99B /* opwatcher.app */,
-				284ABD942D4DB83D0036B99B /* opwatcherTests.xctest */,
-				284ABD9E2D4DB83D0036B99B /* opwatcherUITests.xctest */,
+				284ABD832D4DB8390036B99B /* One Piece Watcher.app */,
+				284ABD942D4DB83D0036B99B /* One Piece WatcherTests.xctest */,
+				284ABD9E2D4DB83D0036B99B /* One Piece WatcherUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -97,9 +107,11 @@
 			children = (
 				284ABD862D4DB8390036B99B /* opwatcherApp.swift */,
 				284ABD882D4DB8390036B99B /* ContentView.swift */,
+				2899BD032D5104C800D92E8E /* EpisodePlayerView.swift */,
 				284ABD8A2D4DB83C0036B99B /* Assets.xcassets */,
 				284ABD8F2D4DB83C0036B99B /* opwatcher.entitlements */,
 				284ABD8C2D4DB83C0036B99B /* Preview Content */,
+				28ED31602D54392300A79A14 /* AVPlayerViewRepresentable.swift */,
 			);
 			path = opwatcher;
 			sourceTree = "<group>";
@@ -129,12 +141,20 @@
 			path = opwatcherUITests;
 			sourceTree = "<group>";
 		};
+		28A4EFBF2D50470800FFEC30 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				28A4EFC02D50470800FFEC30 /* AVKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		284ABD822D4DB8390036B99B /* opwatcher */ = {
+		284ABD822D4DB8390036B99B /* One Piece Watcher */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 284ABDA82D4DB83D0036B99B /* Build configuration list for PBXNativeTarget "opwatcher" */;
+			buildConfigurationList = 284ABDA82D4DB83D0036B99B /* Build configuration list for PBXNativeTarget "One Piece Watcher" */;
 			buildPhases = (
 				284ABD7F2D4DB8390036B99B /* Sources */,
 				284ABD802D4DB8390036B99B /* Frameworks */,
@@ -144,14 +164,16 @@
 			);
 			dependencies = (
 			);
-			name = opwatcher;
+			name = "One Piece Watcher";
+			packageProductDependencies = (
+			);
 			productName = opwatcher;
-			productReference = 284ABD832D4DB8390036B99B /* opwatcher.app */;
+			productReference = 284ABD832D4DB8390036B99B /* One Piece Watcher.app */;
 			productType = "com.apple.product-type.application";
 		};
-		284ABD932D4DB83D0036B99B /* opwatcherTests */ = {
+		284ABD932D4DB83D0036B99B /* One Piece WatcherTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 284ABDAB2D4DB83D0036B99B /* Build configuration list for PBXNativeTarget "opwatcherTests" */;
+			buildConfigurationList = 284ABDAB2D4DB83D0036B99B /* Build configuration list for PBXNativeTarget "One Piece WatcherTests" */;
 			buildPhases = (
 				284ABD902D4DB83D0036B99B /* Sources */,
 				284ABD912D4DB83D0036B99B /* Frameworks */,
@@ -162,14 +184,14 @@
 			dependencies = (
 				284ABD962D4DB83D0036B99B /* PBXTargetDependency */,
 			);
-			name = opwatcherTests;
+			name = "One Piece WatcherTests";
 			productName = opwatcherTests;
-			productReference = 284ABD942D4DB83D0036B99B /* opwatcherTests.xctest */;
+			productReference = 284ABD942D4DB83D0036B99B /* One Piece WatcherTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		284ABD9D2D4DB83D0036B99B /* opwatcherUITests */ = {
+		284ABD9D2D4DB83D0036B99B /* One Piece WatcherUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 284ABDAE2D4DB83D0036B99B /* Build configuration list for PBXNativeTarget "opwatcherUITests" */;
+			buildConfigurationList = 284ABDAE2D4DB83D0036B99B /* Build configuration list for PBXNativeTarget "One Piece WatcherUITests" */;
 			buildPhases = (
 				284ABD9A2D4DB83D0036B99B /* Sources */,
 				284ABD9B2D4DB83D0036B99B /* Frameworks */,
@@ -180,9 +202,9 @@
 			dependencies = (
 				284ABDA02D4DB83D0036B99B /* PBXTargetDependency */,
 			);
-			name = opwatcherUITests;
+			name = "One Piece WatcherUITests";
 			productName = opwatcherUITests;
-			productReference = 284ABD9E2D4DB83D0036B99B /* opwatcherUITests.xctest */;
+			productReference = 284ABD9E2D4DB83D0036B99B /* One Piece WatcherUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -208,7 +230,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 284ABD7E2D4DB8390036B99B /* Build configuration list for PBXProject "opwatcher" */;
+			buildConfigurationList = 284ABD7E2D4DB8390036B99B /* Build configuration list for PBXProject "One Piece Watcher" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -217,13 +239,15 @@
 				Base,
 			);
 			mainGroup = 284ABD7A2D4DB8390036B99B;
+			packageReferences = (
+			);
 			productRefGroup = 284ABD842D4DB8390036B99B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				284ABD822D4DB8390036B99B /* opwatcher */,
-				284ABD932D4DB83D0036B99B /* opwatcherTests */,
-				284ABD9D2D4DB83D0036B99B /* opwatcherUITests */,
+				284ABD822D4DB8390036B99B /* One Piece Watcher */,
+				284ABD932D4DB83D0036B99B /* One Piece WatcherTests */,
+				284ABD9D2D4DB83D0036B99B /* One Piece WatcherUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -260,7 +284,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				284ABD892D4DB8390036B99B /* ContentView.swift in Sources */,
+				28ED31612D54392300A79A14 /* AVPlayerViewRepresentable.swift in Sources */,
 				284ABD872D4DB8390036B99B /* opwatcherApp.swift in Sources */,
+				2899BD042D5104C800D92E8E /* EpisodePlayerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -286,12 +312,12 @@
 /* Begin PBXTargetDependency section */
 		284ABD962D4DB83D0036B99B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 284ABD822D4DB8390036B99B /* opwatcher */;
+			target = 284ABD822D4DB8390036B99B /* One Piece Watcher */;
 			targetProxy = 284ABD952D4DB83D0036B99B /* PBXContainerItemProxy */;
 		};
 		284ABDA02D4DB83D0036B99B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 284ABD822D4DB8390036B99B /* opwatcher */;
+			target = 284ABD822D4DB8390036B99B /* One Piece Watcher */;
 			targetProxy = 284ABD9F2D4DB83D0036B99B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -347,7 +373,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.7;
+				MACOSX_DEPLOYMENT_TARGET = 12.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -401,7 +427,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.7;
+				MACOSX_DEPLOYMENT_TARGET = 12.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -416,6 +442,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = opwatcher/opwatcher.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -424,6 +452,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "One-Piece-Watcher-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "One Piece Watcher";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -432,6 +462,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.skippydream.opwatcher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -443,6 +474,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = opwatcher/opwatcher.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -451,6 +484,8 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "One-Piece-Watcher-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "One Piece Watcher";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -459,6 +494,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.skippydream.opwatcher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -479,7 +515,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/opwatcher.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/opwatcher";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/One Piece Watcher.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/One Piece Watcher";
 			};
 			name = Debug;
 		};
@@ -498,7 +534,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/opwatcher.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/opwatcher";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/One Piece Watcher.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/One Piece Watcher";
 			};
 			name = Release;
 		};
@@ -539,7 +575,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		284ABD7E2D4DB8390036B99B /* Build configuration list for PBXProject "opwatcher" */ = {
+		284ABD7E2D4DB8390036B99B /* Build configuration list for PBXProject "One Piece Watcher" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				284ABDA62D4DB83D0036B99B /* Debug */,
@@ -548,7 +584,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		284ABDA82D4DB83D0036B99B /* Build configuration list for PBXNativeTarget "opwatcher" */ = {
+		284ABDA82D4DB83D0036B99B /* Build configuration list for PBXNativeTarget "One Piece Watcher" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				284ABDA92D4DB83D0036B99B /* Debug */,
@@ -557,7 +593,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		284ABDAB2D4DB83D0036B99B /* Build configuration list for PBXNativeTarget "opwatcherTests" */ = {
+		284ABDAB2D4DB83D0036B99B /* Build configuration list for PBXNativeTarget "One Piece WatcherTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				284ABDAC2D4DB83D0036B99B /* Debug */,
@@ -566,7 +602,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		284ABDAE2D4DB83D0036B99B /* Build configuration list for PBXNativeTarget "opwatcherUITests" */ = {
+		284ABDAE2D4DB83D0036B99B /* Build configuration list for PBXNativeTarget "One Piece WatcherUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				284ABDAF2D4DB83D0036B99B /* Debug */,
