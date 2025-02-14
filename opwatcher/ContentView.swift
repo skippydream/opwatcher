@@ -64,8 +64,7 @@ struct ContentView: View {
                     }
                 }
                 if settings {
-                                List {
-                                    Section(header: Text("Salvataggio").padding(.vertical)) {
+                                Form {
                                         HStack {
                                             Toggle(isOn: $progressi) {
                                             }.toggleStyle(.switch).controlSize(.small)
@@ -75,8 +74,9 @@ struct ContentView: View {
                                             Text("Salvataggio automatico dei progressi")
                                             
                                         }
-                                    }
-                                            Section(header: Text("Filler").padding(.vertical)) {
+                                        Text("Serve il riavvio dell'app perché abbia effetto.")
+                                            .font(.caption)
+                                            .padding(.bottom, 7)
                                                 HStack {
                                                     Toggle(isOn: $skipFiller) {
                                                     }.toggleStyle(.switch).controlSize(.small)
@@ -103,13 +103,10 @@ struct ContentView: View {
                                                             UserDefaults.standard.set(newValue, forKey: "skipMixed")
                                                         }
                                                     Text("Consenti episodi mixed Canon/Filler")
+                                                    
                                                 }
-                                            }
-                                    }
-                                .padding(.leading, 40)
-                                .frame(maxHeight: 160)
-                                .listStyle(SidebarListStyle())
-
+                                    
+                                }.padding(.top, 20)
                     
                 }
                     HStack {
@@ -119,7 +116,7 @@ struct ContentView: View {
                         Button(action: {
                             settings.toggle()
                         }) {
-                            Image(systemName: "gearshape.fill").opacity(0.45)
+                            Image(systemName: settings ? "gearshape" : "gearshape.fill").opacity(0.45)
                             
                         }.buttonStyle(.borderless).font(.system(size: 30)).padding()
                         

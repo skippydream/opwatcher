@@ -117,11 +117,10 @@ struct EpisodePlayerView: View {
         player = AVPlayer(playerItem: playerItem)
         player!.preventsDisplaySleepDuringVideoPlayback = true
         
-            
             if isFirstEpisode {
-                let time = CMTime(seconds: playbackPosition, preferredTimescale: 1)
-                player?.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero)
-                print("posizione - Ho seekkato")
+                    let time = CMTime(seconds: playbackPosition, preferredTimescale: 1)
+                    player?.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero)
+                    print("posizione - Ho seekkato")
             }
         if progressi {
             player?.addPeriodicTimeObserver(
