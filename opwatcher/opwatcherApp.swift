@@ -24,8 +24,8 @@ extension Scene {
 
 @main struct MyApp: App {
     @State var episode: Int = 0
+    @State var isFirstEpisode = true
     @State var playbackPosition: Double = 0.0
-    @State var isFirstEpisode: Bool = true
     @State var releaseButtons = false
     @State var fillerEpisodes: [Int] = [
         54, 55, 56, 57, 58, 59, 60, 98, 99, 102, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140,
@@ -81,9 +81,8 @@ extension Scene {
             ZStack {
                 ContentView(
                     episode: $episode, playbackPosition: $playbackPosition,
-                    isFirstEpisode: $isFirstEpisode, releaseButtons: $releaseButtons,
                     fillerEpisodes: $fillerEpisodes,
-                    mixedFillerEpisodes: $mixedFillerEpisodes,
+                    isFirstEpisode: $isFirstEpisode, mixedFillerEpisodes: $mixedFillerEpisodes,
                     loadLastWatchedEpisode: loadLastWatchedEpisode
                 ).background(VisualEffect().ignoresSafeArea())
             }.onAppear {
@@ -93,7 +92,7 @@ extension Scene {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     NSApp.terminate(nil)  // Chiudi l'app quando la finestra viene chiusa
                 }
-            }.frame(minWidth: 800, maxWidth: 800, minHeight: 550, maxHeight: 550)
+            }.frame(minWidth: 800, maxWidth: 800, minHeight: 494, maxHeight: 494)
 
         }.windowStyle(.hiddenTitleBar).windowToolbarStyle(.automatic)
             .addWindowResizabilityIfAvailable()
