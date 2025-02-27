@@ -23,6 +23,7 @@ extension Scene {
 }
 
 @main struct MyApp: App {
+    
     @State var episode: Int = 0
     @State var isFirstEpisode = true
     @State var playbackPosition: Double = 0.0
@@ -92,9 +93,10 @@ extension Scene {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     NSApp.terminate(nil)  // Chiudi l'app quando la finestra viene chiusa
                 }
-            }.frame(minWidth: 800, maxWidth: 800, minHeight: 494, maxHeight: 494)
+            }.frame(minWidth: 800, maxWidth:800, minHeight: 500, maxHeight: 500
+            )
 
-        }.windowStyle(.hiddenTitleBar).windowToolbarStyle(.automatic)
+        }.windowStyle(.hiddenTitleBar)
             .addWindowResizabilityIfAvailable()
     }
 }

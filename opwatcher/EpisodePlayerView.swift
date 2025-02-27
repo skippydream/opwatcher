@@ -18,11 +18,9 @@ struct EpisodePlayerView: View {
     @Binding var skipFiller: Bool
     @Binding var skipMixed: Bool
     @State var isPlaying = false
-    @State var isReady = false
     @Binding var isFirstEpisode : Bool
-    var incrementEpisode: () -> Void
-    var decrementEpisode: () -> Void
-    
+    @Binding var settings : Bool
+
     private var videoURL: URL {
         let baseURL: String
         switch episode {
@@ -42,9 +40,6 @@ struct EpisodePlayerView: View {
     
     var body: some View {
         
-        ZStack {
-            VStack {
-
                 AVPlayerViewRepresentable(
                     player: player ?? AVPlayer(),
                     showsFullScreenToggleButton: true
@@ -57,51 +52,22 @@ struct EpisodePlayerView: View {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         setupPlayer()
                     }
-                    isReady = false
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                        isReady = true
-                        print("posizione - ho messo ready")
-                    }
+
                 }
                 .onDisappear { savePlaybackPosition() }
-    
-            }
-            
-                Button(action: {
-                    decrementEpisode()
-                }) {
-                    Image(systemName: "arrow.backward.circle.fill")
-                }
-                .buttonStyle(.borderless)
-                .foregroundColor(Color.white)
-                .opacity(isReady ? 0.6 : 0.3)
-                .font(.system(size: 120))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 20)
-                //Play/Pause
-                Button(action: togglePlayPause) {
-                    Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
-                }
-                .buttonStyle(.borderless)
-                .foregroundColor(Color.white)
-                .opacity(isReady ? 0.6 : 0.3)
-                .font(.system(size: 120))
-                .padding(.horizontal, 20)
-                //Prossimo episodio
-                Button(action: {
-                    incrementEpisode()
-                }) {
-                    Image(systemName: "arrow.forward.circle.fill")
-                }
-                .buttonStyle(.borderless)
-                .font(.system(size: 120))
-                .foregroundColor(Color.white)
-                .opacity(isReady ? 0.6 : 0.3)
-                .frame(maxWidth: .infinity, alignment: .trailing)
-                .padding(.horizontal, 20)
-            
-        }.padding(.horizontal, 30).padding(.top, 25)
+                .padding(.horizontal, 20).offset(y: 12)
 
+                //Play/Pause
+        if !settings {
+            Button(action: togglePlayPause) {
+                Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
+            }
+            .buttonStyle(.borderless)
+            .foregroundColor(Color.white)
+            .font(.system(size: 200))
+            .opacity(0.6)
+        }
+            
     }
     
     func savePlaybackPosition() {

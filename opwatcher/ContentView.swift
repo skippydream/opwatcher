@@ -10,8 +10,9 @@ struct ContentView: View {
     @Binding var mixedFillerEpisodes: [Int]
     @State private var errorMessage: String?
     @State private var searchExpand = false
-    @State private var settings = false
+    @State var settings = false
     @State private var showPlayer = true
+    @State var buttonsReady = false
     @State var progressi: Bool = UserDefaults.standard.bool(forKey: "progressi")
     @State var skipFiller: Bool = UserDefaults.standard.bool(forKey: "skipFiller")
     @State var skipMixed: Bool = UserDefaults.standard.bool(forKey: "skipMixed")
@@ -19,7 +20,6 @@ struct ContentView: View {
     var loadLastWatchedEpisode: () -> Void
 
     var body: some View {
-        
             VStack {
                 if showPlayer {
                     ZStack {
@@ -30,39 +30,16 @@ struct ContentView: View {
                             progressi: $progressi,
                             skipFiller: $skipFiller,
                             skipMixed: $skipMixed,
-                            isFirstEpisode: $isFirstEpisode, incrementEpisode: incrementEpisode,
-                            decrementEpisode: decrementEpisode)
-                    }.background(VisualEffect().ignoresSafeArea())
+                            isFirstEpisode: $isFirstEpisode, settings: $settings)
+                    }
                         .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                                buttonsReady = true
+                            }
                             loadLastWatchedEpisode()  // Carica l'episodio e la posizione quando la vista appare
                         }
                 }
-                if !settings {
-                    if searchExpand {
-                        TextField("Cerca un episodio (es. 37)", text: $inputEpisode).focused(
-                            $isInputFocused
-                        ).textFieldStyle(PlainTextFieldStyle()).padding(
-                            EdgeInsets(top: 10, leading: 40, bottom: 10, trailing: 15)
-                        ).background(
-                            RoundedRectangle(cornerRadius: 50).strokeBorder(
-                                Color.gray, lineWidth: 0.5)
-                        ).font(.system(size: 24, weight: .ultraLight)).frame(maxWidth: .infinity)
-                            .onSubmit {
-                                if let episodeInt = Int(inputEpisode) {
-                                    episode = episodeInt
-                                }
-                                searchExpand.toggle()
-                            }.padding(.horizontal, 80).padding(.top, 10).onAppear {
-                                isInputFocused = true
-                            }.onChange(of: searchExpand) { value in
-                                if value {
-                                    isInputFocused = true
-                                } else {
-                                    isInputFocused = false
-                                }
-                            }
-                    }
-                }
+
                 if settings {
                                 Form {
                                         HStack {
@@ -109,37 +86,87 @@ struct ContentView: View {
                                 }.padding(.top, 20)
                     
                 }
-                    HStack {
-                      
-                        
-                        //Impostazioni
+                HStack {
                         Button(action: {
-                            settings.toggle()
+                            decrementEpisode()
                         }) {
-                            Image(systemName: settings ? "gearshape" : "gearshape.fill").opacity(0.45)
-                            
-                        }.buttonStyle(.borderless).font(.system(size: 30)).padding()
+                                Image(systemName: "arrow.backward.circle.fill")
+                        }
+                        .buttonStyle(.borderless)
+                        .foregroundColor(Color.white)
+                        .font(.system(size: 80))
+                        .opacity(buttonsReady ? 0.6 : 0.15)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding()
+                    //Impostazioni
+                    Button(action: {
+                        settings.toggle()
+                    }) {
+ 
+                            Image(systemName: settings ? "chevron.down.circle.fill" : "gear").opacity(0.45)
+                    }.buttonStyle(.borderless).font(.system(size: 40)).padding(.horizontal)
+                    Divider().frame(maxHeight: 25)
+
+                    //EP Attuale
+                    VStack {
+                        Text("\(episode)").font(.system(size: 55)).foregroundColor(
+                            mixedFillerEpisodes.contains(episode)
+                            ? Color.orange
+                            : fillerEpisodes.contains(episode)
+                            ? Color.red : Color.gray)
+                        if fillerEpisodes.contains(episode) {
+                            Text("Filler!").fontWeight(.heavy).foregroundColor(Color.red)
+                        }
+                        if mixedFillerEpisodes.contains(episode) {
+                            Text("Mixed Filler").fontWeight(.heavy).foregroundColor(Color.orange)
+                        }
+                    }.padding()
+                    Divider().frame(maxHeight: 25)
+
+                    //Search button
+                    Button(action: {
+                        searchExpand.toggle()
+                    }) {
+                        Image(systemName: searchExpand ? "chevron.left.circle.fill" : "arrow.forward.to.line.circle.fill").opacity(0.45)
                         
-                        Divider().frame(height: 40)
-                        
-                        //TextField
-                        Button(action: {
-                            searchExpand.toggle()  // Carica l'ultimo episodio
-                            
-                        }) {
-                            VStack {
-                                Text("Ep. attuale:").font(.caption2)
-                                Text("\(episode)").font(.system(size: 30)).foregroundColor(
-                                    mixedFillerEpisodes.contains(episode)
-                                    ? Color.orange
-                                    : fillerEpisodes.contains(episode)
-                                    ? Color.red : Color.gray)
+                    }.buttonStyle(.borderless).font(.system(size: 40)).padding(.horizontal)
+
+                    //Barra ricerca
+                    if searchExpand {
+                        TextField("Numero ep.", text: $inputEpisode)
+                            .focused($isInputFocused)
+                            .textFieldStyle(PlainTextFieldStyle())
+                            .font(.system(size: 25, weight: .ultraLight)).frame(maxWidth: 150)
+                            .onSubmit {
+                                if let episodeInt = Int(inputEpisode) {
+                                    episode = episodeInt
+                                }
+                                searchExpand.toggle()
+                            }.onAppear {
+                                isInputFocused = true
+                            }.onChange(of: searchExpand) { value in
+                                if value {
+                                    isInputFocused = true
+                                } else {
+                                    isInputFocused = false
+                                }
                             }
-                        }.buttonStyle(.borderless).font(.system(size: 30)).padding()
-                            .opacity(0.8)
+                    }
+                    
+                        //Prossimo episodio
+                        Button(action: {
+                            incrementEpisode()
+                        }) {
+                            Image(systemName: "arrow.forward.circle.fill")
+                        }
+                        .buttonStyle(.borderless)
+                        .foregroundColor(Color.white)
+                        .font(.system(size: 80))
+                        .opacity(buttonsReady ? 0.6 : 0.15)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .padding()
 
-                    }.offset(y: -5)
-
+                }
             }
     }
     
