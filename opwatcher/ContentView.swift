@@ -8,6 +8,7 @@ struct ContentView: View {
     @Binding var fillerEpisodes: [Int]
     @Binding var isFirstEpisode : Bool
     @Binding var mixedFillerEpisodes: [Int]
+    @Binding var timerOn: Bool
     @State private var errorMessage: String?
     @State private var searchExpand = false
     @State var settings = false
@@ -17,16 +18,20 @@ struct ContentView: View {
     @State var skipFiller: Bool = UserDefaults.standard.bool(forKey: "skipFiller")
     @State var skipMixed: Bool = UserDefaults.standard.bool(forKey: "skipMixed")
     @FocusState private var isInputFocused: Bool
+
+    
     var loadLastWatchedEpisode: () -> Void
 
     var body: some View {
             VStack {
+                
                 if showPlayer {
                     ZStack {
+                        
                         EpisodePlayerView(
                             episode: $episode, playbackPosition: $playbackPosition,
                             fillerEpisodes: $fillerEpisodes,
-                            mixedFillerEpisodes: $mixedFillerEpisodes,
+                            mixedFillerEpisodes: $mixedFillerEpisodes, timerOn: $timerOn,
                             progressi: $progressi,
                             skipFiller: $skipFiller,
                             skipMixed: $skipMixed,
@@ -48,7 +53,8 @@ struct ContentView: View {
                                                 .onChange(of: $progressi.wrappedValue) { newValue in
                                                     UserDefaults.standard.set(newValue, forKey: "progressi")
                                                 }
-                                            Text("Salvataggio automatico dei progressi")
+                                            Text("Salvataggio automatico").bold()
+                                                + Text (" dei progressi")
                                             
                                         }
                                         Text("Serve il riavvio dell'app perché abbia effetto.")
@@ -66,7 +72,8 @@ struct ContentView: View {
                                                                 skipMixed = true
                                                             }
                                                         }
-                                                    Text("Consenti gli episodi Filler")
+                                                    Text("Consenti gli episodi ")
+                                                    + Text("Filler").bold()
                                                     
                                                     
                                                     
@@ -79,11 +86,23 @@ struct ContentView: View {
                                                         .onChange(of: $skipMixed.wrappedValue) { newValue in
                                                             UserDefaults.standard.set(newValue, forKey: "skipMixed")
                                                         }
-                                                    Text("Consenti episodi mixed Canon/Filler")
+                                                    Text("Consenti episodi ")
+                                                        + Text("mixed").bold()
+                                                        + Text(" Canon/Filler")
                                                     
                                                 }
+                                    HStack {
+                                        Toggle(isOn: $timerOn) {
+                                        }.toggleStyle(.switch).controlSize(.small)
+                                            .accentColor(Color.blue)
+                                            .onChange(of: $timerOn.wrappedValue) { newValue in
+                                                UserDefaults.standard.set(newValue, forKey: "timerOn")
+                                            }
+                                        Text("Attiva  ")
+                                            + Text("cronometro").bold()                                        
+                                    }
                                     
-                                }.padding(.top, 20)
+                                }.padding(.top, 30)
                     
                 }
                 HStack {
@@ -93,7 +112,7 @@ struct ContentView: View {
                                 Image(systemName: "arrow.backward.circle.fill")
                         }
                         .buttonStyle(.borderless)
-                        .foregroundColor(Color.white)
+                        .foregroundColor(Color.gray)
                         .font(.system(size: 80))
                         .opacity(buttonsReady ? 0.6 : 0.15)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -120,6 +139,7 @@ struct ContentView: View {
                         if mixedFillerEpisodes.contains(episode) {
                             Text("Mixed Filler").fontWeight(.heavy).foregroundColor(Color.orange)
                         }
+                        
                     }.padding()
                     Divider().frame(maxHeight: 25)
 
@@ -160,7 +180,7 @@ struct ContentView: View {
                             Image(systemName: "arrow.forward.circle.fill")
                         }
                         .buttonStyle(.borderless)
-                        .foregroundColor(Color.white)
+                        .foregroundColor(Color.gray)
                         .font(.system(size: 80))
                         .opacity(buttonsReady ? 0.6 : 0.15)
                         .frame(maxWidth: .infinity, alignment: .trailing)
@@ -215,5 +235,6 @@ struct ContentView: View {
             episode += 1
         }
     }
+
     
 }

@@ -14,12 +14,16 @@ struct EpisodePlayerView: View {
     @State private var player: AVPlayer?
     @Binding var fillerEpisodes: [Int]
     @Binding var mixedFillerEpisodes: [Int]
+    @Binding var timerOn: Bool
     @Binding var progressi: Bool
     @Binding var skipFiller: Bool
     @Binding var skipMixed: Bool
     @State var isPlaying = false
     @Binding var isFirstEpisode : Bool
     @Binding var settings : Bool
+    @State private var secondsElapsed: Int = 0  // Secondi trascorsi
+    @State private var timer: Timer?
+
 
     private var videoURL: URL {
         let baseURL: String
@@ -44,6 +48,7 @@ struct EpisodePlayerView: View {
                     player: player ?? AVPlayer(),
                     showsFullScreenToggleButton: true
                 ).onAppear { setupPlayer()
+                    startTimer()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
                         isFirstEpisode = false
                     }
@@ -66,6 +71,14 @@ struct EpisodePlayerView: View {
             .foregroundColor(Color.white)
             .font(.system(size: 200))
             .opacity(0.6)
+            if timerOn {
+                Text("\(formattedTime())")
+                    .font(.system(size: 40, weight: .light))
+                    .foregroundColor(.white)
+                    .opacity(0.6)
+                    .padding(.horizontal)
+                    .offset(y: -130)
+            }
         }
             
     }
@@ -103,10 +116,34 @@ struct EpisodePlayerView: View {
         
         if isPlaying {
             player.pause()
+            stopTimer()
         } else {
             player.play()
+            startTimer()
         }
         isPlaying.toggle()
+    }
+    func formattedTime() -> String {
+           let hours = secondsElapsed / 3600
+           let minutes = (secondsElapsed % 3600) / 60
+           let seconds = secondsElapsed % 60
+           
+           return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+       }
+    
+    func startTimer() {
+            // Avvia il timer solo se non è già in esecuzione
+            if timer == nil {
+                timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+                    secondsElapsed += 1  // Incrementa il tempo trascorso di un secondo
+                }
+            }
+        }
+    
+    func stopTimer() {
+        // Annulla il timer se è in esecuzione
+        timer?.invalidate()
+        timer = nil
     }
 }
 

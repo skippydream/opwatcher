@@ -28,6 +28,8 @@ extension Scene {
     @State var isFirstEpisode = true
     @State var playbackPosition: Double = 0.0
     @State var releaseButtons = false
+    @State var timerOn: Bool = UserDefaults.standard.bool(forKey: "timerOn")
+
     @State var fillerEpisodes: [Int] = [
         54, 55, 56, 57, 58, 59, 60, 98, 99, 102, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140,
         141, 142, 143, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 220, 221, 222, 223,
@@ -84,7 +86,7 @@ extension Scene {
                     episode: $episode, playbackPosition: $playbackPosition,
                     fillerEpisodes: $fillerEpisodes,
                     isFirstEpisode: $isFirstEpisode, mixedFillerEpisodes: $mixedFillerEpisodes,
-                    loadLastWatchedEpisode: loadLastWatchedEpisode
+                    timerOn: $timerOn, loadLastWatchedEpisode: loadLastWatchedEpisode
                 ).background(VisualEffect().ignoresSafeArea())
             }.onAppear {
                 loadLastWatchedEpisode()
