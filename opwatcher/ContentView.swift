@@ -8,7 +8,6 @@ struct ContentView: View {
     @Binding var fillerEpisodes: [Int]
     @Binding var isFirstEpisode : Bool
     @Binding var mixedFillerEpisodes: [Int]
-    @Binding var timerOn: Bool
     @State private var errorMessage: String?
     @State private var searchExpand = false
     @State var settings = false
@@ -31,7 +30,7 @@ struct ContentView: View {
                         EpisodePlayerView(
                             episode: $episode, playbackPosition: $playbackPosition,
                             fillerEpisodes: $fillerEpisodes,
-                            mixedFillerEpisodes: $mixedFillerEpisodes, timerOn: $timerOn,
+                            mixedFillerEpisodes: $mixedFillerEpisodes, 
                             progressi: $progressi,
                             skipFiller: $skipFiller,
                             skipMixed: $skipMixed,
@@ -91,17 +90,6 @@ struct ContentView: View {
                                                         + Text(" Canon/Filler")
                                                     
                                                 }
-                                    HStack {
-                                        Toggle(isOn: $timerOn) {
-                                        }.toggleStyle(.switch).controlSize(.small)
-                                            .accentColor(Color.blue)
-                                            .onChange(of: $timerOn.wrappedValue) { newValue in
-                                                UserDefaults.standard.set(newValue, forKey: "timerOn")
-                                            }
-                                        Text("Attiva  ")
-                                            + Text("cronometro").bold()                                        
-                                    }
-                                    
                                 }.padding(.top, 30)
                     
                 }
@@ -122,7 +110,7 @@ struct ContentView: View {
                         settings.toggle()
                     }) {
  
-                            Image(systemName: settings ? "chevron.down.circle.fill" : "gear").opacity(0.45)
+                            Image(systemName: settings ? "chevron.down" : "gear").opacity(0.45)
                     }.buttonStyle(.borderless).font(.system(size: 40)).padding(.horizontal)
                     Divider().frame(maxHeight: 25)
 
@@ -147,30 +135,33 @@ struct ContentView: View {
                     Button(action: {
                         searchExpand.toggle()
                     }) {
-                        Image(systemName: searchExpand ? "chevron.left.circle.fill" : "arrow.forward.to.line.circle.fill").opacity(0.45)
+                        Image(systemName: isInputFocused ? "chevron.backward" : "1.magnifyingglass").opacity(0.45)
                         
                     }.buttonStyle(.borderless).font(.system(size: 40)).padding(.horizontal)
 
                     //Barra ricerca
                     if searchExpand {
-                        TextField("Numero ep.", text: $inputEpisode)
-                            .focused($isInputFocused)
-                            .textFieldStyle(PlainTextFieldStyle())
-                            .font(.system(size: 25, weight: .ultraLight)).frame(maxWidth: 150)
-                            .onSubmit {
-                                if let episodeInt = Int(inputEpisode) {
-                                    episode = episodeInt
-                                }
-                                searchExpand.toggle()
-                            }.onAppear {
-                                isInputFocused = true
-                            }.onChange(of: searchExpand) { value in
-                                if value {
+                        VStack {
+                            TextField("Cerca...", text: $inputEpisode)
+                                .focused($isInputFocused)
+                                .textFieldStyle(PlainTextFieldStyle())
+                                .font(.system(size: 25, weight: .ultraLight)).frame(maxWidth: 150)
+                                .onSubmit {
+                                    if let episodeInt = Int(inputEpisode) {
+                                        episode = episodeInt
+                                    }
+                                    searchExpand.toggle()
+                                }.onAppear {
                                     isInputFocused = true
-                                } else {
-                                    isInputFocused = false
+                                }.onChange(of: searchExpand) { value in
+                                    if value {
+                                        isInputFocused = true
+                                    } else {
+                                        isInputFocused = false
+                                    }
                                 }
-                            }
+                            Text("Scrivi il numero dell'episodio e premi invio").font(.caption)
+                        }
                     }
                     
                         //Prossimo episodio
