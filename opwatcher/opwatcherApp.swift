@@ -47,36 +47,71 @@ extension Scene {
         var playbackPosition: Double
     }
     private func loadLastWatchedEpisode() {
-        // Tenta di ottenere i dati salvati da UserDefaults
-        if let savedData = UserDefaults.standard.data(forKey: "lastWatchedEpisode") {
-            let decoder = JSONDecoder()
-            do {
-                // Prova a decodificare i dati salvati
-                let savedEpisode = try decoder.decode(WatchedEpisode.self, from: savedData)
-                episode = savedEpisode.episode
-                playbackPosition = savedEpisode.playbackPosition
-                print("Caricato episodio \(episode), posizione \(playbackPosition)")
-            } catch {
-                print("Errore nella decodifica dei dati: \(error)")
+        guard let url = URL(string: "https://selfless-comfort-production.up.railway.app/api/lastWatchedEpisode") else { return }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET" // Metodo GET per ottenere i dati
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Errore nella richiesta GET: \(error)")
+                return
             }
-        } else {
-            print("Nessun dato salvato trovato.")
+            
+            if let data = data {
+                let decoder = JSONDecoder()
+                do {
+                    let savedEpisode = try decoder.decode(WatchedEpisode.self, from: data)
+                    DispatchQueue.main.async {
+                        self.episode = savedEpisode.episode
+                        self.playbackPosition = savedEpisode.playbackPosition
+                        print("Caricato episodio \(self.episode), posizione \(self.playbackPosition)")
+                    }
+                } catch {
+                    print("Errore nella decodifica dei dati: \(error)")
+                }
+            }
         }
+        
+        task.resume()
     }
+
 
     private func saveLastWatchedEpisode() {
         let watchedEpisode = WatchedEpisode(episode: episode, playbackPosition: playbackPosition)
         let encoder = JSONEncoder()
+        
         do {
-            // Prova a codificare i dati
             let encoded = try encoder.encode(watchedEpisode)
-            // Salva i dati nel UserDefaults
-            UserDefaults.standard.set(encoded, forKey: "lastWatchedEpisode")
-            print("Episodio salvato: \(episode), posizione salvata: \(playbackPosition)")
+            
+            guard let url = URL(string: "https://selfless-comfort-production.up.railway.app/api/lastWatchedEpisode") else { return }
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST" // Metodo POST per inviare i dati
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = encoded
+            
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("Errore nella richiesta POST: \(error)")
+                    return
+                }
+                
+                if let response = response as? HTTPURLResponse, response.statusCode == 200 {
+                    print("Episodio salvato: \(self.episode), posizione salvata: \(self.playbackPosition)")
+                } else {
+                    print("Errore nel salvataggio dei dati.")
+                }
+            }
+            
+            task.resume()
+            
         } catch {
             print("Errore nella codifica dei dati: \(error)")
         }
     }
+
 
     var body: some Scene {
         WindowGroup {
@@ -84,15 +119,12 @@ extension Scene {
                 ContentView(
                     episode: $episode, playbackPosition: $playbackPosition,
                     fillerEpisodes: $fillerEpisodes,
-                    isFirstEpisode: $isFirstEpisode, mixedFillerEpisodes: $mixedFillerEpisodes,                     loadLastWatchedEpisode: loadLastWatchedEpisode
+                    isFirstEpisode: $isFirstEpisode, mixedFillerEpisodes: $mixedFillerEpisodes,                     loadLastWatchedEpisode: loadLastWatchedEpisode, saveLastWatchedEpisode: saveLastWatchedEpisode
                 ).background(VisualEffect().ignoresSafeArea())
             }.onAppear {
                 loadLastWatchedEpisode()
             }.onDisappear {
-                saveLastWatchedEpisode()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     NSApp.terminate(nil)  // Chiudi l'app quando la finestra viene chiusa
-                }
             }.frame(minWidth: 800, maxWidth:800, minHeight: 500, maxHeight: 500
             )
 

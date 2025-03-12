@@ -13,13 +13,13 @@ struct ContentView: View {
     @State var settings = false
     @State private var showPlayer = true
     @State var buttonsReady = false
-    @State var progressi: Bool = UserDefaults.standard.bool(forKey: "progressi")
     @State var skipFiller: Bool = UserDefaults.standard.bool(forKey: "skipFiller")
     @State var skipMixed: Bool = UserDefaults.standard.bool(forKey: "skipMixed")
     @FocusState private var isInputFocused: Bool
 
     
     var loadLastWatchedEpisode: () -> Void
+    var saveLastWatchedEpisode: () -> Void
 
     var body: some View {
             VStack {
@@ -31,7 +31,6 @@ struct ContentView: View {
                             episode: $episode, playbackPosition: $playbackPosition,
                             fillerEpisodes: $fillerEpisodes,
                             mixedFillerEpisodes: $mixedFillerEpisodes, 
-                            progressi: $progressi,
                             skipFiller: $skipFiller,
                             skipMixed: $skipMixed,
                             isFirstEpisode: $isFirstEpisode, settings: $settings)
@@ -46,19 +45,6 @@ struct ContentView: View {
 
                 if settings {
                                 Form {
-                                        HStack {
-                                            Toggle(isOn: $progressi) {
-                                            }.toggleStyle(.switch).controlSize(.small)
-                                                .onChange(of: $progressi.wrappedValue) { newValue in
-                                                    UserDefaults.standard.set(newValue, forKey: "progressi")
-                                                }
-                                            Text("Salvataggio automatico").bold()
-                                                + Text (" dei progressi")
-                                            
-                                        }
-                                        Text("Serve il riavvio dell'app perché abbia effetto.")
-                                            .font(.caption)
-                                            .padding(.bottom, 7)
                                                 HStack {
                                                     Toggle(isOn: $skipFiller) {
                                                     }.toggleStyle(.switch).controlSize(.small)
@@ -99,23 +85,17 @@ struct ContentView: View {
                         }) {
                                 Image(systemName: "arrow.backward.circle.fill")
                         }
+                        .help("Vai all'episodio precedente.")
                         .buttonStyle(.borderless)
                         .foregroundColor(Color.gray)
                         .font(.system(size: 80))
                         .opacity(buttonsReady ? 0.6 : 0.15)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
-                    //Impostazioni
-                    Button(action: {
-                        settings.toggle()
-                    }) {
- 
-                            Image(systemName: settings ? "chevron.down" : "gear").opacity(0.45)
-                    }.buttonStyle(.borderless).font(.system(size: 40)).padding(.horizontal)
-                    Divider().frame(maxHeight: 25)
-
+                    
                     //EP Attuale
                     VStack {
+                        
                         Text("\(episode)").font(.system(size: 55)).foregroundColor(
                             mixedFillerEpisodes.contains(episode)
                             ? Color.orange
@@ -129,15 +109,40 @@ struct ContentView: View {
                         }
                         
                     }.padding()
-                    Divider().frame(maxHeight: 25)
+                        .help("Questo è l'episodio attuale.")
 
+                    Divider().frame(maxHeight: 25)
+                    
+                    //Impostazioni
+                    Button(action: {
+                        settings.toggle()
+                    }) {
+ 
+                            Image(systemName: settings ? "chevron.down" : "gear").opacity(0.6)
+                    }.buttonStyle(.borderless).font(.system(size: 45)).padding(.horizontal)
+                        .help("Apri le impostazioni.")
+                    Divider().frame(maxHeight: 25)
+                    
+                    //Salvataggio
+                    Button(action: {
+                        saveLastWatchedEpisode()
+                    }) {
+ 
+                            Image(systemName: "square.and.arrow.down.badge.clock").opacity(0.6)
+                    }.buttonStyle(.borderless).font(.system(size: 45)).padding(.horizontal)
+                        .help("Salva l'episodio corrente e la sua posizione.")
+
+                    Divider().frame(maxHeight: 25)
+                    
                     //Search button
                     Button(action: {
                         searchExpand.toggle()
                     }) {
-                        Image(systemName: isInputFocused ? "chevron.backward" : "1.magnifyingglass").opacity(0.45)
+                        Image(systemName: isInputFocused ? "chevron.backward" : "1.magnifyingglass").opacity(0.6)
                         
-                    }.buttonStyle(.borderless).font(.system(size: 40)).padding(.horizontal)
+                    }.buttonStyle(.borderless).font(.system(size: 45)).padding(.horizontal)
+                        .help("Cerca un episodio.")
+
 
                     //Barra ricerca
                     if searchExpand {
@@ -170,6 +175,8 @@ struct ContentView: View {
                         }) {
                             Image(systemName: "arrow.forward.circle.fill")
                         }
+                        .help("Va al prossimo episodio.")
+
                         .buttonStyle(.borderless)
                         .foregroundColor(Color.gray)
                         .font(.system(size: 80))

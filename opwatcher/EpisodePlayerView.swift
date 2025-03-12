@@ -14,7 +14,6 @@ struct EpisodePlayerView: View {
     @State private var player: AVPlayer?
     @Binding var fillerEpisodes: [Int]
     @Binding var mixedFillerEpisodes: [Int]
-    @Binding var progressi: Bool
     @Binding var skipFiller: Bool
     @Binding var skipMixed: Bool
     @State var isPlaying = false
@@ -91,14 +90,12 @@ struct EpisodePlayerView: View {
                     player?.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero)
                     print("posizione - Ho seekkato")
             }
-        if progressi {
             player?.addPeriodicTimeObserver(
                 forInterval: CMTime(seconds: 5, preferredTimescale: 1), queue: .main
             ) { time in
                 self.playbackPosition = time.seconds  // usa self direttamente
                 print("posizione - ho aggiornato")
             }
-        }
     }
     
     private func togglePlayPause() {
