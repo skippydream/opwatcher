@@ -15,7 +15,11 @@
 		284ABDA32D4DB83D0036B99B /* opwatcherUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284ABDA22D4DB83D0036B99B /* opwatcherUITests.swift */; };
 		284ABDA52D4DB83D0036B99B /* opwatcherUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284ABDA42D4DB83D0036B99B /* opwatcherUITestsLaunchTests.swift */; };
 		2899BD042D5104C800D92E8E /* EpisodePlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2899BD032D5104C800D92E8E /* EpisodePlayerView.swift */; };
+		289B53E82D89BA0B00AB16EA /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 289B53E72D89BA0800AB16EA /* SettingsView.swift */; };
 		28B537612D51D9AE00C05403 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28A4EFC02D50470800FFEC30 /* AVKit.framework */; };
+		28C1EC082D83512400A4C720 /* UserSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C1EC072D83511F00A4C720 /* UserSelectionView.swift */; };
+		28C1EC0B2D83516800A4C720 /* EpisodeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C1EC0A2D83516500A4C720 /* EpisodeService.swift */; };
+		28C1EC0D2D83675200A4C720 /* ModeSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28C1EC0C2D83674D00A4C720 /* ModeSelectionView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,7 +52,11 @@
 		284ABDA22D4DB83D0036B99B /* opwatcherUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = opwatcherUITests.swift; sourceTree = "<group>"; };
 		284ABDA42D4DB83D0036B99B /* opwatcherUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = opwatcherUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		2899BD032D5104C800D92E8E /* EpisodePlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodePlayerView.swift; sourceTree = "<group>"; };
+		289B53E72D89BA0800AB16EA /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		28A4EFC02D50470800FFEC30 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
+		28C1EC072D83511F00A4C720 /* UserSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSelectionView.swift; sourceTree = "<group>"; };
+		28C1EC0A2D83516500A4C720 /* EpisodeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EpisodeService.swift; sourceTree = "<group>"; };
+		28C1EC0C2D83674D00A4C720 /* ModeSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeSelectionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +111,10 @@
 		284ABD852D4DB8390036B99B /* opwatcher */ = {
 			isa = PBXGroup;
 			children = (
+				289B53E72D89BA0800AB16EA /* SettingsView.swift */,
+				28C1EC0C2D83674D00A4C720 /* ModeSelectionView.swift */,
+				28C1EC0A2D83516500A4C720 /* EpisodeService.swift */,
+				28C1EC072D83511F00A4C720 /* UserSelectionView.swift */,
 				284ABD862D4DB8390036B99B /* opwatcherApp.swift */,
 				284ABD882D4DB8390036B99B /* ContentView.swift */,
 				2899BD032D5104C800D92E8E /* EpisodePlayerView.swift */,
@@ -280,8 +292,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				289B53E82D89BA0B00AB16EA /* SettingsView.swift in Sources */,
+				28C1EC0D2D83675200A4C720 /* ModeSelectionView.swift in Sources */,
 				284ABD892D4DB8390036B99B /* ContentView.swift in Sources */,
 				284ABD872D4DB8390036B99B /* opwatcherApp.swift in Sources */,
+				28C1EC082D83512400A4C720 /* UserSelectionView.swift in Sources */,
+				28C1EC0B2D83516800A4C720 /* EpisodeService.swift in Sources */,
 				2899BD042D5104C800D92E8E /* EpisodePlayerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

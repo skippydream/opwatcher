@@ -8,7 +8,6 @@ struct ContentView: View {
     @Binding var fillerEpisodes: [Int]
     @Binding var isFirstEpisode : Bool
     @Binding var mixedFillerEpisodes: [Int]
-    @State private var errorMessage: String?
     @State private var searchExpand = false
     @State var settings = false
     @State private var showPlayer = true
@@ -16,14 +15,47 @@ struct ContentView: View {
     @State var skipFiller: Bool = UserDefaults.standard.bool(forKey: "skipFiller")
     @State var skipMixed: Bool = UserDefaults.standard.bool(forKey: "skipMixed")
     @FocusState private var isInputFocused: Bool
+    @Binding  var selectedUsername: String
+    @State private var selectedEpisode: Episode?
+    @State private var isSynced: Bool = false
+    @ObservedObject var episodeService = EpisodeService() // Servizio per caricare gli episodi
 
-    
     var loadLastWatchedEpisode: () -> Void
     var saveLastWatchedEpisode: () -> Void
-
+    
     var body: some View {
             VStack {
-                
+                ZStack {
+                    //EP Attuale
+                    HStack {
+                        Text("\(episode)").font(.system(size: 55)).foregroundColor(
+                            mixedFillerEpisodes.contains(episode)
+                            ? Color.orange
+                            : fillerEpisodes.contains(episode)
+                            ? Color.red : Color.gray)
+                        if fillerEpisodes.contains(episode) {
+                            Text("Filler!").fontWeight(.heavy).foregroundColor(Color.red)
+                        }
+                        if mixedFillerEpisodes.contains(episode) {
+                            Text("Mixed Filler").fontWeight(.heavy).foregroundColor(Color.orange)
+                        }
+                        
+                    }
+                        .help("Questo è l'episodio attuale.")
+                        .padding(1)
+                    
+                    
+                    //Utente
+                    Button(action: {
+                    }) {
+                        Text(selectedUsername == "mic" ? "Mic" : "Lu")
+                            .font(.system(size: 30))
+                            .foregroundColor(selectedUsername == "ludo" ? Color.purple : Color.orange)                            .padding()
+                    }
+                    .buttonStyle(.borderless)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .padding(.trailing)
+               }
                 if showPlayer {
                     ZStack {
                         
@@ -36,9 +68,7 @@ struct ContentView: View {
                             isFirstEpisode: $isFirstEpisode, settings: $settings)
                     }
                         .onAppear {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
                                 buttonsReady = true
-                            }
                             loadLastWatchedEpisode()  // Carica l'episodio e la posizione quando la vista appare
                         }
                 }
@@ -80,6 +110,7 @@ struct ContentView: View {
                     
                 }
                 HStack {
+                    //EP precedente
                         Button(action: {
                             decrementEpisode()
                         }) {
@@ -93,47 +124,17 @@ struct ContentView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding()
                     
-                    //EP Attuale
-                    VStack {
-                        
-                        Text("\(episode)").font(.system(size: 55)).foregroundColor(
-                            mixedFillerEpisodes.contains(episode)
-                            ? Color.orange
-                            : fillerEpisodes.contains(episode)
-                            ? Color.red : Color.gray)
-                        if fillerEpisodes.contains(episode) {
-                            Text("Filler!").fontWeight(.heavy).foregroundColor(Color.red)
-                        }
-                        if mixedFillerEpisodes.contains(episode) {
-                            Text("Mixed Filler").fontWeight(.heavy).foregroundColor(Color.orange)
-                        }
-                        
-                    }.padding()
-                        .help("Questo è l'episodio attuale.")
-
-                    Divider().frame(maxHeight: 25)
-                    
                     //Impostazioni
-                    Button(action: {
-                        settings.toggle()
-                    }) {
- 
+                    if !searchExpand {
+                        Button(action: {
+                            settings.toggle()
+                        }) {
+                            
                             Image(systemName: settings ? "chevron.down" : "gear").opacity(0.6)
-                    }.buttonStyle(.borderless).font(.system(size: 45)).padding(.horizontal)
-                        .help("Apri le impostazioni.")
-                    Divider().frame(maxHeight: 25)
-                    
-                    //Salvataggio
-                    Button(action: {
-                        saveLastWatchedEpisode()
-                    }) {
- 
-                            Image(systemName: "square.and.arrow.down.badge.clock").opacity(0.6)
-                    }.buttonStyle(.borderless).font(.system(size: 45)).padding(.horizontal)
-                        .help("Salva l'episodio corrente e la sua posizione.")
-
-                    Divider().frame(maxHeight: 25)
-                    
+                        }.buttonStyle(.borderless).font(.system(size: 45)).padding(.horizontal)
+                            .help("Apri le impostazioni.")
+                        Divider().frame(maxHeight: 25)
+                    }
                     //Search button
                     Button(action: {
                         searchExpand.toggle()
@@ -187,7 +188,7 @@ struct ContentView: View {
                 }
             }
     }
-    
+
     // Funzione per decrementare l'episodio, saltando gli episodi filler o mixed filler
     func decrementEpisode() {
         if !skipFiller && !skipMixed {

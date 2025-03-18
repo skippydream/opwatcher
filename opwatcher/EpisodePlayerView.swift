@@ -21,7 +21,6 @@ struct EpisodePlayerView: View {
     @Binding var settings : Bool
 
 
-
     private var videoURL: URL {
         let baseURL: String
         switch episode {
@@ -45,9 +44,7 @@ struct EpisodePlayerView: View {
                     player: player ?? AVPlayer(),
                     showsFullScreenToggleButton: true
                 ).onAppear { setupPlayer()
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                        isFirstEpisode = false
-                    }
+
                 }
                 .onChange(of: episode) { _ in
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
@@ -84,18 +81,22 @@ struct EpisodePlayerView: View {
         let playerItem = AVPlayerItem(url: videoURL)
         player = AVPlayer(playerItem: playerItem)
         player!.preventsDisplaySleepDuringVideoPlayback = true
-        
-            if isFirstEpisode {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                
+                if isFirstEpisode {
                     let time = CMTime(seconds: playbackPosition, preferredTimescale: 1)
                     player?.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero)
                     print("posizione - Ho seekkato")
+                    isFirstEpisode = false
+                }
+                player?.addPeriodicTimeObserver(
+                    forInterval: CMTime(seconds: 5, preferredTimescale: 1), queue: .main
+                ) { time in
+                    self.playbackPosition = time.seconds  // usa self direttamente
+                    print("posizione - ho aggiornato")
+                }
             }
-            player?.addPeriodicTimeObserver(
-                forInterval: CMTime(seconds: 5, preferredTimescale: 1), queue: .main
-            ) { time in
-                self.playbackPosition = time.seconds  // usa self direttamente
-                print("posizione - ho aggiornato")
-            }
+            
     }
     
     private func togglePlayPause() {
