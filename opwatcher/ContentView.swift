@@ -119,30 +119,28 @@ struct ContentView: View {
                         }.buttonStyle(.borderless).font(.system(size: 45)).padding(.horizontal)
                             .help("Apri le impostazioni.")
                         //Download
-                        if !searchExpand {
-                            Button(action: {
-                                openDownloads = true
-                            }) {
-                                Image(systemName: "arrow.down.circle").opacity(0.6)
-                            }
-                            .buttonStyle(.borderless)
-                            .font(.system(size: 45))
-                            .padding(.horizontal)
-                            .help("Apri i download.")
-                            .sheet(isPresented: $openDownloads) {
-                                DownloadManagerView(openDownloads: $openDownloads, episode: $episode)
-                            }
+                        Button(action: {
+                            openDownloads = true
+                        }) {
+                            Image(systemName: "arrow.down.circle").opacity(0.6)
+                        }
+                        .buttonStyle(.borderless)
+                        .font(.system(size: 45))
+                        .padding(.horizontal)
+                        .help("Apri i download.")
+                        .sheet(isPresented: $openDownloads) {
+                            DownloadManagerView(openDownloads: $openDownloads, episode: $episode)
                             
                         }
+                    }
                         //Search button
                         Button(action: {
                             searchExpand.toggle()
                         }) {
-                            Image(systemName: isInputFocused ? "chevron.backward" : "1.magnifyingglass").opacity(0.6)
+                            Image(systemName: searchExpand ? "chevron.backward.circle" : "1.magnifyingglass").opacity(0.6)
                             
                         }.buttonStyle(.borderless).font(.system(size: 45)).padding(.horizontal)
                             .help("Cerca un episodio.")
-                        
                         
                         //Barra ricerca
                         if searchExpand {
@@ -186,7 +184,6 @@ struct ContentView: View {
                         .padding()
                         
                     }
-                }
                 .onAppear {
                     let state = EpisodeStateManager.load()
                     episode = state.episode > 0 ? state.episode : episode // evita 0 se mai salvato
