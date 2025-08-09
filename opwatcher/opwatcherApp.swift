@@ -12,6 +12,30 @@ struct VisualEffect: NSViewRepresentable {
     func updateNSView(_ nsView: NSView, context: Context) {}
 }
 
+extension View {
+    func alwaysOnTop() -> some View {
+        self.background(
+            AlwaysOnTopConfigurator()
+        )
+    }
+}
+
+struct AlwaysOnTopConfigurator: NSViewRepresentable {
+    func makeNSView(context: Context) -> NSView {
+        let view = NSView()
+        
+        DispatchQueue.main.async {
+            if let window = view.window {
+                window.level = .floating // 🔥 always on top
+            }
+        }
+        
+        return view
+    }
+    
+    func updateNSView(_ nsView: NSView, context: Context) {}
+}
+
 extension Scene {
     func addWindowResizabilityIfAvailable() -> some Scene {
         if #available(macOS 13, *) {
@@ -28,8 +52,8 @@ extension Scene {
     @State var isFirstEpisode = true
     @State var playbackPosition: Double = 0.0
     @State var releaseButtons = false
-    //@State private var selectedUsername: String = UserDefaults.standard.string(forKey: "selectedUsername") ?? "none"
-    @State private var selectedUsername: String = "none"
+    @State var cinema: Bool = false
+
 
     @State var fillerEpisodes: [Int] = [
         54, 55, 56, 57, 58, 59, 60, 98, 99, 102, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140,
@@ -51,123 +75,31 @@ extension Scene {
         var timestamp: String
     }
     
-    
-    private func loadLastWatchedEpisode() {
-        // Usa l'username selezionato per caricare i dati dell'utente
-        guard !selectedUsername.isEmpty && selectedUsername != "none" else {
-            print("Nome utente non selezionato.")
-            return
-        }
-        
-        guard let url = URL(string: "https://selfless-comfort-production.up.railway.app/api/lastWatchedEpisode/\(selectedUsername)") else {
-            print("Errore URL")
-            return
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET" // Metodo GET per ottenere i dati
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                print("Errore nella richiesta GET: \(error)")
-                return
-            }
-
-            if let data = data {
-                let decoder = JSONDecoder()
-                do {
-                    let savedEpisode = try decoder.decode(WatchedEpisode.self, from: data)
-                    DispatchQueue.main.async {
-                        self.episode = savedEpisode.episode
-                        self.playbackPosition = savedEpisode.playbackPosition
-                        // Gestisci anche username e timestamp se necessario
-                        print("Caricato episodio \(self.episode), posizione \(self.playbackPosition), utente \(savedEpisode.username), timestamp \(savedEpisode.timestamp)")
-                    }
-                } catch {
-                    print("Errore nella decodifica dei dati: \(error)")
-                }
-            }
-        }
-
-        task.resume()
-    }
-
-
-    
-    
-    func saveLastWatchedEpisode() {
-        // Verifica che `selectedUsername` non sia "none"
-        guard !selectedUsername.isEmpty && selectedUsername != "none" else {
-            print("Nessun nome utente selezionato")
-            return
-        }
-        
-        let timestamp = ISO8601DateFormatter().string(from: Date())
-
-        // Crea l'oggetto WatchedEpisode includendo l'username
-        let watchedEpisode = WatchedEpisode(episode: episode, playbackPosition: playbackPosition, username: selectedUsername, timestamp: timestamp)
-        let encoder = JSONEncoder()
-
-        do {
-            let encoded = try encoder.encode(watchedEpisode)
-
-            // Usa l'endpoint che permette di salvare i dati per un utente specifico
-            guard let url = URL(string: "https://selfless-comfort-production.up.railway.app/api/lastWatchedEpisode") else { return }
-
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.httpBody = encoded
-
-            let task = URLSession.shared.dataTask(with: request) { data, response, error in
-                if let error = error {
-                    print("Errore nella richiesta POST: \(error)")
-                    return
-                }
-
-                if let response = response as? HTTPURLResponse, response.statusCode == 200 {
-                    print("Episodio salvato: \(episode), posizione salvata: \(playbackPosition), utente \(selectedUsername), timestamp \(timestamp)")
-                } else {
-                    print("Errore nel salvataggio dei dati.")
-                }
-            }
-
-            task.resume()
-        } catch {
-            print("Errore nella codifica dei dati: \(error)")
-        }
-    }
-
-    
     var body: some Scene {
         WindowGroup {
-            if selectedUsername != "none" {
                 ZStack {
                     ContentView(
-                        episode: $episode, playbackPosition: $playbackPosition,
-                        fillerEpisodes: $fillerEpisodes,
-                        isFirstEpisode: $isFirstEpisode, mixedFillerEpisodes: $mixedFillerEpisodes,                     selectedUsername: $selectedUsername, loadLastWatchedEpisode: loadLastWatchedEpisode, saveLastWatchedEpisode: saveLastWatchedEpisode
-                    ).background(VisualEffect().ignoresSafeArea())
-                }.onAppear {
-                    loadLastWatchedEpisode()
-                }.onDisappear {
-                    saveLastWatchedEpisode()
+                    episode: $episode, playbackPosition: $playbackPosition,
+                       fillerEpisodes: $fillerEpisodes,
+                       isFirstEpisode: $isFirstEpisode, mixedFillerEpisodes: $mixedFillerEpisodes, cinema: $cinema)
+                    .background(VisualEffect().ignoresSafeArea())
+                       // .alwaysOnTop()
+
+                    
+                }
+                .onDisappear {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                         NSApp.terminate(nil)  // Chiudi l'app quando la finestra viene chiusa
                     }
-                }.frame(minWidth: 800, maxWidth:800, minHeight: 500, maxHeight: 500)
-
-        
-            }
-            
-            else  {
-                UserSelectionView(selectedUsername: $selectedUsername)
-            }
-            
+                    
+                }
+                .frame(minWidth: 600, minHeight: 345)
 
         }
+        .defaultSize(CGSize(width: 600, height: 578))
         .windowStyle(.hiddenTitleBar)
-        .addWindowResizabilityIfAvailable()
+        .windowResizability(.contentSize)
     }
+    
+
 }

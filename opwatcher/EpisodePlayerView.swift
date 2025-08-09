@@ -19,7 +19,7 @@ struct EpisodePlayerView: View {
     @State var isPlaying = false
     @Binding var isFirstEpisode : Bool
     @Binding var settings : Bool
-
+    @Binding var cinema: Bool
 
     private var videoURL: URL {
         let baseURL: String
@@ -39,40 +39,55 @@ struct EpisodePlayerView: View {
     }
     
     var body: some View {
-        
-                AVPlayerViewRepresentable(
-                    player: player ?? AVPlayer(),
-                    showsFullScreenToggleButton: true
-                ).onAppear { setupPlayer()
-
-                }
-                .onChange(of: episode) { _ in
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        setupPlayer()
-                    }
-
-                }
-                .onDisappear { savePlaybackPosition() }
-                .padding(.horizontal, 20).offset(y: 12)
-
-                //Play/Pause
-        if !settings {
-            Button(action: togglePlayPause) {
-                Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
-            }
-            .buttonStyle(.borderless)
-            .foregroundColor(Color.white)
-            .font(.system(size: 200))
-            .opacity(0.6)
-
-        }
             
-    }
-    
-    func savePlaybackPosition() {
-        let currentTime = player?.currentTime()
-        playbackPosition = currentTime!.seconds
-        UserDefaults.standard.set(playbackPosition, forKey: "playbackPosition")
+            AVPlayerViewRepresentable(
+                player: player ?? AVPlayer(),
+                showsFullScreenToggleButton: true
+            ).onAppear { setupPlayer()
+                
+            }
+            .onChange(of: episode) { _ in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    setupPlayer()
+                }
+                
+            }
+            .onDisappear {
+                EpisodeStateManager.save(
+                    episode: episode,
+                    playbackPosition: playbackPosition,
+                    skipFiller: skipFiller,
+                    skipMixed: skipMixed,
+                    isFirstEpisode: isFirstEpisode
+                )
+            }
+            .padding(.horizontal, 20).offset(y: 12)
+            
+            //Play/Pause
+            if !settings && !cinema {
+                Button(action: togglePlayPause) {
+                    Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
+                        .opacity(0.4)
+                }
+                .buttonStyle(.borderless)
+                .foregroundColor(Color.white)
+                .font(.system(size: 200))
+                
+            }
+        //Cinema
+        Button(action: {cinema.toggle()
+            if cinema {reduceWindowHeight(to: 345)}
+            else {reduceWindowHeight(to: 578)}
+        }) {
+            Image(systemName: cinema ? "rectangle.expand.vertical" : "rectangle.compress.vertical")
+                .opacity(cinema ? 0.25 : 0.7)
+        }
+        .buttonStyle(.borderless)
+        .foregroundColor(Color.white)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+        .padding(20).padding(.horizontal, 5)
+        .font(.system(size: 50))
+            
     }
     
         func setupPlayer() {
@@ -82,21 +97,42 @@ struct EpisodePlayerView: View {
         player = AVPlayer(playerItem: playerItem)
         player!.preventsDisplaySleepDuringVideoPlayback = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                // 🎯 Carica la posizione salvata per questo episodio
+                let savedPosition = EpisodeStateManager.loadPlaybackPosition(for: episode)
                 
-                if isFirstEpisode {
-                    let time = CMTime(seconds: playbackPosition, preferredTimescale: 1)
+                if savedPosition > 5 { // evitiamo di fare seek se la posizione è quasi 0
+                    let time = CMTime(seconds: savedPosition, preferredTimescale: 1)
                     player?.seek(to: time, toleranceBefore: .zero, toleranceAfter: .zero)
-                    print("posizione - Ho seekkato")
-                    isFirstEpisode = false
+                    print("Seek automatico a \(savedPosition) sec per episodio \(episode)")
                 }
+                
+                // ⏱ Aggiorna posizione ogni 5 secondi
                 player?.addPeriodicTimeObserver(
                     forInterval: CMTime(seconds: 5, preferredTimescale: 1), queue: .main
                 ) { time in
-                    self.playbackPosition = time.seconds  // usa self direttamente
-                    print("posizione - ho aggiornato")
+                    self.playbackPosition = time.seconds
+                    
+                    if let duration = player?.currentItem?.duration.seconds, duration.isFinite {
+                        // Se siamo negli ultimi 40 secondi
+                        if duration - time.seconds <= 40 {
+                            // Salva posizione 0 per il prossimo episodio
+                            EpisodeStateManager.savePlaybackPosition(for: episode + 1, position: 0, duration: duration)
+                            
+                            // Passa automaticamente al prossimo episodio se non già fatto
+                            if isPlaying {
+                                player?.pause()
+                                episode += 1
+                                playbackPosition = 0
+                                setupPlayer() // Carica subito il prossimo episodio
+                                print("➡️ Passato automaticamente all'episodio \(episode)")
+                            }
+                        } else {
+                            // Salva normalmente
+                            EpisodeStateManager.savePlaybackPosition(for: episode, position: time.seconds, duration: duration)
+                        }
+                    }
                 }
             }
-            
     }
     
     private func togglePlayPause() {
@@ -108,6 +144,19 @@ struct EpisodePlayerView: View {
             player.play()
         }
         isPlaying.toggle()
+    }
+    
+    func reduceWindowHeight(to newHeight: CGFloat) {
+        if let window = NSApplication.shared.windows.first {
+            var frame = window.frame
+            let heightDelta = frame.height - newHeight
+
+            // Aggiusta la posizione Y per mantenere il top in posizione
+            frame.origin.y += heightDelta
+            frame.size.height = newHeight
+
+            window.setFrame(frame, display: true, animate: true)
+        }
     }
 }
 
