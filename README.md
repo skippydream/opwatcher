@@ -1,3 +1,7 @@
+![GitHub Release](https://img.shields.io/github/v/release/skippydream/opwatcher)
+![Github latest release](https://img.shields.io/github/last-commit/skippydream/opwatcher)
+![GitHub repo size](https://img.shields.io/github/repo-size/skippydream/opwatcher)
+
 # One Piece Watcher
 
 **One Piece Watcher** è un'applicazione sviluppata in SwiftUI per la visione in streaming degli episodi di **One Piece** in versione **sub ita**. L'app offre un'interfaccia semplice per navigare tra gli episodi, cercare episodi specifici e visualizzare i video con un lettore integrato che supporta la modalità schermo intero e comandi personalizzati.
