@@ -6,7 +6,6 @@
 
 **One Piece Watcher** è un'applicazione sviluppata in SwiftUI per la visione in streaming degli episodi di **One Piece** in versione **sub ita**. L'app offre un'interfaccia semplice per navigare tra gli episodi, cercare episodi specifici e visualizzare i video con un lettore integrato che supporta la modalità schermo intero e comandi personalizzati.
 
-
 ## Funzionalità principali
 
 - **Navigazione tra episodi**: Puoi facilmente passare all'episodio precedente o successivo tramite icone intuitive.
@@ -14,6 +13,7 @@
 - **Ricerca per episodio**: Puoi cercare un episodio specifico inserendo il numero dell'episodio. Se l'episodio è un filler o un mixed filler, viene visualizzato un avviso.
 - **Controllo della riproduzione**: Puoi mettere in pausa, riprendere e navigare tra gli episodi direttamente dal lettore video.
 - **Supporto per modalità schermo intero**: Puoi passare facilmente alla modalità schermo intero per un'esperienza di visione più immersiva.
+- **Download degli episodi tramite FFmpeg**: È stata implementata una sezione che consente il download degli episodi in locale utilizzando **FFmpeg**, offrendo la possibilità di guardarli offline. 
 
 ## Come funziona
 
@@ -23,8 +23,8 @@ L'app si basa su un sistema di navigazione degli episodi, permettendo agli utent
 
 - **Indietro e Avanti**: Usa i pulsanti per spostarti tra gli episodi.
 - **Cerca episodio**: Inserisci il numero dell'episodio per trovarlo rapidamente.
-- **Ultimo episodio**: Carica automaticamente l'ultimo episodio visto.
 - **Visualizzazione episodi filler**: Se un episodio è identificato come filler o mixed filler, verrà mostrato un avviso che permette all'utente di decidere se procedere comunque con la visione.
+- **Download episodi**: Accedi alla sezione download per scaricare gli episodi selezionati in locale tramite FFmpeg.
 
 <p align="center">
   <img src="https://github.com/skippydream/opwatcher/blob/main/Images/1.png?raw=true" width="350"/>
