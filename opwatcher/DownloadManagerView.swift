@@ -13,7 +13,10 @@ struct DownloadItem: Identifiable {
 class DownloadManager: ObservableObject {
     @Published var downloads: [DownloadItem] = []
     private var totalDuration: Double?
-    
+    private var activeProcesses: [Int: Process] = [:]
+
+
+
     init() {
         loadExistingDownloads()
     }
@@ -75,6 +78,21 @@ class DownloadManager: ObservableObject {
         return baseFolder.appendingPathComponent("\(episodeName).mp4")
     }
     
+    func cancelDownload(for episode: Int) {
+        DispatchQueue.global().async {
+            if let process = self.activeProcesses[episode] {
+                process.terminate()
+                self.activeProcesses.removeValue(forKey: episode)
+            }
+
+            DispatchQueue.main.async {
+                if let index = self.downloads.firstIndex(where: { $0.episode == episode }) {
+                    self.downloads.remove(at: index)
+                }
+            }
+        }
+    }
+
     func startDownload(for episode: Int, from url: URL) {
         if downloads.contains(where: { $0.episode == episode && $0.isDownloading }) { return }
         
@@ -94,7 +112,8 @@ class DownloadManager: ObservableObject {
         
         DispatchQueue.global(qos: .background).async {
             let process = Process()
-            
+            self.activeProcesses[episode] = process
+
             guard let ffmpegPath = Bundle.main.path(forResource: "ffmpeg", ofType: nil) else {
                 print("❌ ffmpeg non trovato nel bundle!")
                 DispatchQueue.main.async {
@@ -167,6 +186,7 @@ class DownloadManager: ObservableObject {
                 DispatchQueue.main.async {
                     if let index = self.downloads.firstIndex(where: { $0.episode == episode }) {
                         self.downloads.remove(at: index)
+                        self.activeProcesses.removeValue(forKey: episode)
                     }
                 }
             }
@@ -200,139 +220,178 @@ class DownloadManager: ObservableObject {
     }
 }
 
+extension Int: Identifiable {
+    public var id: Int { self }
+}
+
+
 struct DownloadManagerView: View {
     @StateObject private var downloadManager = DownloadManager()
     @State var selectedEpisodeToPlay: Int? = nil
     @State private var showPlayer = false
     @Binding var openDownloads: Bool
     @Binding var episode: Int
-    
-    // Ora mostra tutti gli episodi scaricati (o scaricabili) dinamicamente
-    var episodesToShow: [Int] {
-        // Unisci episodi scaricati + 10 episodi recenti da scaricare
+
+    init(openDownloads: Binding<Bool>, episode: Binding<Int>) {
+        self._openDownloads = openDownloads
+        self._episode = episode
+    }
+
+    private var episodesToShow: [Int] {
         let maxDownloaded = downloadManager.downloads.map { $0.episode }.max() ?? 0
         let maxEpisode = episode + 25
-
         return Array(episode...maxEpisode)
     }
 
     var body: some View {
-        VStack {
+        VStack(alignment: .leading, spacing: 20) {
+            // Titolo e chiudi
+            HStack {
+                Text("Download Episodi")
+                    .font(.system(size: 20, weight: .bold))
+                Spacer()
+                Button(action: { openDownloads = false }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.secondary)
+                        .font(.title2)
+                }
+                .buttonStyle(BorderlessButtonStyle())
+                .help("Chiudi")
+            }
+            .padding(.bottom, 10)
+
+            Divider()
+
             List(episodesToShow, id: \.self) { episode in
                 HStack {
                     Text("Episodio \(episode)")
+                        .font(.headline)
                     Spacer()
                     if let download = downloadManager.downloads.first(where: { $0.episode == episode }) {
                         if download.isDownloading {
-                            ProgressView(value: download.progress)
-                                .progressViewStyle(LinearProgressViewStyle())
-                                .frame(width: 150)
-                        } else if let localURL = download.localFileURL {
+                            HStack(spacing: 12) {
+                                ProgressView(value: download.progress)
+                                    .progressViewStyle(LinearProgressViewStyle())
+                                    .frame(width: 150)
+
+                                Button(action: {
+                                    downloadManager.cancelDownload(for: episode)
+                                }) {
+                                    Image(systemName: "xmark.circle.fill")
+                                        .foregroundColor(.red)
+                                }
+                                .buttonStyle(BorderlessButtonStyle())
+                                .help("Annulla il download dell'episodio \(episode)")
+                            }
+                        } else {
                             Button("Play") {
                                 selectedEpisodeToPlay = episode
+                            }
+                            .disabled(download.localFileURL == nil)
+                            .buttonStyle(BorderlessButtonStyle())
+                            .help(download.localFileURL == nil ? "File non ancora disponibile" : "Riproduci episodio \(episode)")
+                            .onChange(of: selectedEpisodeToPlay) { newValue in
+                                guard let ep = newValue,
+                                      let dl = downloadManager.downloads.first(where: { $0.episode == ep }),
+                                      dl.localFileURL != nil else {
+                                    showPlayer = false
+                                    return
+                                }
                                 showPlayer = true
                             }
-                            .buttonStyle(.borderless)
-                        } else {
-                            downloadButton(for: episode)
                         }
                     } else {
                         downloadButton(for: episode)
                     }
                 }
-                .padding(.vertical, 6)
+                .padding(.vertical, 8)
             }
             .listStyle(PlainListStyle())
-            
-            HStack {
-                // Torna indietro
-                Button(action: {
-                    openDownloads = false
-                }) {
+
+            HStack(spacing: 30) {
+                Button(action: { openDownloads = false }) {
                     Image(systemName: "chevron.backward.circle")
                         .font(.system(size: 33))
                         .foregroundColor(.gray)
                         .opacity(0.6)
                 }
+                .buttonStyle(BorderlessButtonStyle())
                 .help("Chiudi la vista dei download.")
-                .buttonStyle(.borderless)
-                .padding(.top, 12)
-                                
+
                 Spacer()
-                
-                // Cartella
-                Button(action: {
-                    if let appSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
-                        let folderURL = appSupportURL.appendingPathComponent("OnePieceDownloads")
-                        
-                        if FileManager.default.fileExists(atPath: folderURL.path) {
-                            NSWorkspace.shared.open(folderURL)
-                        } else {
-                            print("Cartella non trovata")
-                        }
-                    } else {
-                        print("Impossibile trovare la directory Application Support")
-                    }
-                }) {
+
+                Button(action: openDownloadFolder) {
                     Image(systemName: "folder.circle")
                         .font(.system(size: 33))
                         .foregroundColor(.gray)
                         .opacity(0.6)
                 }
+                .buttonStyle(BorderlessButtonStyle())
                 .help("Apri directory di download.")
-                .buttonStyle(.borderless)
-                .padding(.top, 12)
             }
+            .padding(.top, 15)
             .padding(.bottom, 20)
-
         }
-        .frame(minWidth: 400, minHeight: 400)
-        .padding()
-        .sheet(isPresented: $showPlayer, onDismiss: {
-            selectedEpisodeToPlay = nil
-        }) {
-            if let episode = selectedEpisodeToPlay,
-               let download = downloadManager.downloads.first(where: { $0.episode == episode }),
+        .padding(25)
+        .frame(minWidth: 400, minHeight: 420)
+        .sheet(item: $selectedEpisodeToPlay) { episode in
+            if let download = downloadManager.downloads.first(where: { $0.episode == episode }),
                let url = download.localFileURL {
                 VideoPlayerView(url: url)
+                    .onAppear { print("[Sheet] Player aperto per episodio \(episode)") }
+                    .onDisappear { print("[Sheet] Player scomparso per episodio \(episode)") }
             } else {
-                Text("Riprova")
+                Text("File non disponibile")
+                    .padding()
             }
         }
     }
 
     @ViewBuilder
-        private func downloadButton(for episode: Int) -> some View {
-            Button(action: {
-                let url = getVideoURL(for: episode)
-                downloadManager.startDownload(for: episode, from: url)
-            }) {
-                Image(systemName: "arrow.down.circle")
-                    .font(.system(size: 20))
-                    .foregroundColor(.blue)
+    private func downloadButton(for episode: Int) -> some View {
+        Button {
+            let url = getVideoURL(for: episode)
+            downloadManager.startDownload(for: episode, from: url)
+        } label: {
+            Label("Scarica", systemImage: "arrow.down.circle")
+                .labelStyle(IconOnlyLabelStyle())
+                .font(.system(size: 20))
+                .foregroundColor(.blue)
+        }
+        .buttonStyle(BorderlessButtonStyle())
+        .help("Scarica episodio \(episode)")
+    }
+
+    private func openDownloadFolder() {
+        if let appSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
+            let folderURL = appSupportURL.appendingPathComponent("OnePieceDownloads")
+            if FileManager.default.fileExists(atPath: folderURL.path) {
+                NSWorkspace.shared.open(folderURL)
+            } else {
+                print("Cartella non trovata")
             }
-            .buttonStyle(.borderless)
-            .help("Scarica episodio \(episode).")
+        } else {
+            print("Impossibile trovare la directory Application Support")
         }
+    }
 
-
-    func getVideoURL(for episode: Int) -> URL {
-        let baseURL: String
+    private func getServerBaseURL(for episode: Int) -> String {
         switch episode {
-        case let ep where ep >= 1060:
-            baseURL = "https://srv30.sake.streampeaker.org/DDL/ANIME/OnePiece/"
-        case let ep where ep >= 951:
-            baseURL = "https://srv21.kurai.streampeaker.org/DDL/ANIME/OnePiece/"
-        case let ep where ep >= 801:
-            baseURL = "https://srv23.shiro.streampeaker.org/DDL/ANIME/OnePiece/"
-        case let ep where ep >= 401:
-            baseURL = "https://srv38.fukurou.streampeaker.org/DDL/ANIME/OnePiece/"
-        default: baseURL = "https://srv37.nezumi.streampeaker.org/DDL/ANIME/OnePiece/"
+        case 1060...: return "https://srv30.sake.streampeaker.org/DDL/ANIME/OnePiece/"
+        case 951...:  return "https://srv21.kurai.streampeaker.org/DDL/ANIME/OnePiece/"
+        case 801...:  return "https://srv23.shiro.streampeaker.org/DDL/ANIME/OnePiece/"
+        case 401...:  return "https://srv38.fukurou.streampeaker.org/DDL/ANIME/OnePiece/"
+        default:      return "https://srv37.nezumi.streampeaker.org/DDL/ANIME/OnePiece/"
         }
+    }
+
+    private func getVideoURL(for episode: Int) -> URL {
+        let baseURL = getServerBaseURL(for: episode)
         let episodeString = String(format: "%04d", episode)
         return URL(string: "\(baseURL)\(episodeString)/playlist.m3u8")!
     }
 }
+
 
 struct VideoPlayerView: View {
     let url: URL
@@ -341,3 +400,4 @@ struct VideoPlayerView: View {
                   .frame(minWidth: 640, minHeight: 360)
     }
 }
+

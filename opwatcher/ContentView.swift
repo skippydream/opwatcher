@@ -16,8 +16,9 @@ struct ContentView: View {
     @FocusState private var isInputFocused: Bool
     @State private var isSynced: Bool = false
     @Binding var cinema: Bool
-    @State private var openDownloads = false
-
+    @State public var openDownloads: Bool = false
+    @State private var showSettings = false
+    
     var body: some View {
         VStack {
             ZStack {
@@ -112,12 +113,19 @@ struct ContentView: View {
                     //Impostazioni
                     if !searchExpand {
                         Button(action: {
-                            settings.toggle()
+                            showSettings = true
                         }) {
                             
                             Image(systemName: settings ? "chevron.down" : "gear").opacity(0.6)
-                        }.buttonStyle(.borderless).font(.system(size: 45)).padding(.horizontal)
-                            .help("Apri le impostazioni.")
+                        }
+                        .buttonStyle(.borderless)
+                        .font(.system(size: 45))
+                        .padding(.horizontal)
+                        .help("Apri le impostazioni.")
+                        .sheet(isPresented: $showSettings) {
+                            SettingsSheetView(isPresented: $showSettings, skipFiller: $skipFiller, skipMixed: $skipMixed)
+                        }
+                        
                         //Download
                         Button(action: {
                             openDownloads = true
@@ -268,3 +276,93 @@ struct ContentView: View {
         
     }
 
+
+struct SettingsSheetView: View {
+    @Binding var isPresented: Bool
+    
+    @Binding var skipFiller: Bool
+    @Binding var skipMixed: Bool
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 25) {
+            // Titolo e chiudi
+            HStack {
+                Text("Impostazioni Episodi")
+                    .font(.system(size: 20, weight: .bold))
+                Spacer()
+                Button(action: {
+                    isPresented = false
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.secondary)
+                        .font(.title2)
+                }
+                .buttonStyle(BorderlessButtonStyle())
+                .help("Chiudi")
+            }
+            .padding(.bottom, 10)
+            
+            Divider()
+            
+            // Primo toggle con testo a sinistra, toggle a destra
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("Consenti filler")
+                        .font(.headline)
+                    (
+                        Text("Se disattivato, salterai gli episodi ")
+                        .foregroundColor(.secondary) +
+                        Text("Filler")
+                            .bold()
+                            .foregroundColor(.red)
+                    )
+                    .font(.subheadline)
+                }
+                
+                Spacer()
+                
+                Toggle("", isOn: $skipFiller)
+                    .toggleStyle(SwitchToggleStyle(tint: .red))
+                    .labelsHidden()
+                    .onChange(of: skipFiller) { newValue in
+                        UserDefaults.standard.set(newValue, forKey: "skipFiller")
+                        if newValue {
+                            skipMixed = true
+                        }
+                    }
+                    .frame(width: 50)
+            }
+            
+            // Secondo toggle con testo a sinistra, toggle a destra
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("Consenti mixed-filler")
+                        .font(.headline)
+                    (
+                        Text("Se disattivato, salterai gli episodi ")
+                        .foregroundColor(.secondary) +
+                        Text("Canon/Filler")
+                            .bold()
+                            .foregroundColor(.orange)
+                    )
+                    .font(.subheadline)
+                }
+                
+                Spacer()
+                
+                Toggle("", isOn: $skipMixed)
+                    .toggleStyle(SwitchToggleStyle(tint: .orange))
+                    .labelsHidden()
+                    .disabled(skipFiller)
+                    .onChange(of: skipMixed) { newValue in
+                        UserDefaults.standard.set(newValue, forKey: "skipMixed")
+                    }
+                    .frame(width: 50)
+            }
+            
+            Spacer()
+        }
+        .padding(25)
+        .frame(minWidth: 350, minHeight: 220)
+    }
+}
