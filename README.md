@@ -45,7 +45,7 @@ L'app si basa su un sistema di navigazione degli episodi, permettendo agli utent
 
 1. Clona il repository:
    ```bash
-   git clone https://github.com/skippydream/one-piece-watcher.git
+   git clone https://github.com/skippydream/opwatcher.git
    ```
 
 2. Apri il progetto in Xcode.
