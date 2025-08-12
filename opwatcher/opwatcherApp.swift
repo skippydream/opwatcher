@@ -53,8 +53,8 @@ extension Scene {
     @State var playbackPosition: Double = 0.0
     @State var releaseButtons = false
     @State var cinema: Bool = false
-
-
+    
+    
     @State var fillerEpisodes: [Int] = [
         54, 55, 56, 57, 58, 59, 60, 98, 99, 102, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140,
         141, 142, 143, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 220, 221, 222, 223,
@@ -77,29 +77,29 @@ extension Scene {
     
     var body: some Scene {
         WindowGroup {
-                ZStack {
-                    ContentView(
+            ZStack {
+                ContentView(
                     episode: $episode, playbackPosition: $playbackPosition,
-                       fillerEpisodes: $fillerEpisodes,
-                       isFirstEpisode: $isFirstEpisode, mixedFillerEpisodes: $mixedFillerEpisodes, cinema: $cinema)
-                    .background(VisualEffect().ignoresSafeArea())
-                       // .alwaysOnTop()
-
-                    
+                    fillerEpisodes: $fillerEpisodes,
+                    isFirstEpisode: $isFirstEpisode, mixedFillerEpisodes: $mixedFillerEpisodes, cinema: $cinema)
+                .background(VisualEffect().ignoresSafeArea())
+                // .alwaysOnTop()
+                
+                
+            }
+            .onDisappear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    NSApp.terminate(nil)  // Chiudi l'app quando la finestra viene chiusa
                 }
-                .onDisappear {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        NSApp.terminate(nil)  // Chiudi l'app quando la finestra viene chiusa
-                    }
-                    
-                }
-                .frame(minWidth: 600, minHeight: 345)
-
+                
+            }
+            .frame(minWidth: 600, minHeight: 345)
+            
         }
         .defaultSize(CGSize(width: 600, height: 578))
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
     }
     
-
+    
 }

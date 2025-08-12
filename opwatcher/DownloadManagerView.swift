@@ -14,9 +14,9 @@ class DownloadManager: ObservableObject {
     @Published var downloads: [DownloadItem] = []
     private var totalDuration: Double?
     private var activeProcesses: [Int: Process] = [:]
-
-
-
+    
+    
+    
     init() {
         loadExistingDownloads()
     }
@@ -84,7 +84,19 @@ class DownloadManager: ObservableObject {
                 process.terminate()
                 self.activeProcesses.removeValue(forKey: episode)
             }
-
+            
+            let episodeName = "OnePiece_Episode_\(episode)"
+            let fileURL = self.prepareOutputURL(for: episodeName)
+            
+            if let fileURL = fileURL, FileManager.default.fileExists(atPath: fileURL.path) {
+                do {
+                    try FileManager.default.removeItem(at: fileURL)
+                    print("✅ File eliminato: \(fileURL.path)")
+                } catch {
+                    print("❌ Errore nell'eliminazione del file: \(error.localizedDescription)")
+                }
+            }
+            
             DispatchQueue.main.async {
                 if let index = self.downloads.firstIndex(where: { $0.episode == episode }) {
                     self.downloads.remove(at: index)
@@ -92,7 +104,7 @@ class DownloadManager: ObservableObject {
             }
         }
     }
-
+    
     func startDownload(for episode: Int, from url: URL) {
         if downloads.contains(where: { $0.episode == episode && $0.isDownloading }) { return }
         
@@ -113,7 +125,7 @@ class DownloadManager: ObservableObject {
         DispatchQueue.global(qos: .background).async {
             let process = Process()
             self.activeProcesses[episode] = process
-
+            
             guard let ffmpegPath = Bundle.main.path(forResource: "ffmpeg", ofType: nil) else {
                 print("❌ ffmpeg non trovato nel bundle!")
                 DispatchQueue.main.async {
@@ -231,18 +243,21 @@ struct DownloadManagerView: View {
     @State private var showPlayer = false
     @Binding var openDownloads: Bool
     @Binding var episode: Int
+    @State private var episodeToDelete: Int? = nil
+    @State private var showDeleteAlert = false
 
+    
     init(openDownloads: Binding<Bool>, episode: Binding<Int>) {
         self._openDownloads = openDownloads
         self._episode = episode
     }
-
+    
     private var episodesToShow: [Int] {
         let maxDownloaded = downloadManager.downloads.map { $0.episode }.max() ?? 0
         let maxEpisode = episode + 25
         return Array(episode...maxEpisode)
     }
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             // Titolo e chiudi
@@ -259,9 +274,9 @@ struct DownloadManagerView: View {
                 .help("Chiudi")
             }
             .padding(.bottom, 10)
-
+            
             Divider()
-
+            
             List(episodesToShow, id: \.self) { episode in
                 HStack {
                     Text("Episodio \(episode)")
@@ -273,7 +288,7 @@ struct DownloadManagerView: View {
                                 ProgressView(value: download.progress)
                                     .progressViewStyle(LinearProgressViewStyle())
                                     .frame(width: 150)
-
+                                
                                 Button(action: {
                                     downloadManager.cancelDownload(for: episode)
                                 }) {
@@ -284,22 +299,47 @@ struct DownloadManagerView: View {
                                 .help("Annulla il download dell'episodio \(episode)")
                             }
                         } else {
-                            Button("Play") {
-                                selectedEpisodeToPlay = episode
-                            }
-                            .disabled(download.localFileURL == nil)
-                            .buttonStyle(BorderlessButtonStyle())
-                            .help(download.localFileURL == nil ? "File non ancora disponibile" : "Riproduci episodio \(episode)")
-                            .onChange(of: selectedEpisodeToPlay) { newValue in
-                                guard let ep = newValue,
-                                      let dl = downloadManager.downloads.first(where: { $0.episode == ep }),
-                                      dl.localFileURL != nil else {
-                                    showPlayer = false
-                                    return
-                                }
-                                showPlayer = true
+                            HStack {
+                                   Button(action: {
+                                       downloadManager.cancelDownload(for: episode)
+                                   }) {
+                                       Image(systemName: "xmark.circle.fill")  // Cestino a sinistra
+                                           .foregroundColor(.red)
+                                   }
+                                   .buttonStyle(BorderlessButtonStyle())
+                                   .help("Elimina episodio \(episode)")
+                                                                      
+                                Divider()
+
+                                   Button {
+                                       selectedEpisodeToPlay = episode
+                                   } label: {
+                                       Label("Riproduci", systemImage: "play.circle")  // Play a destra
+                                           .labelStyle(IconOnlyLabelStyle())
+                                           .font(.system(size: 20))
+                                           .foregroundColor(.blue)
+                                   }
+                                   .disabled(download.localFileURL == nil)
+                                   .buttonStyle(BorderlessButtonStyle())
+                                   .help(download.localFileURL == nil ? "File non ancora disponibile" : "Riproduci episodio \(episode)")
+                               }
+                            .alert(isPresented: $showDeleteAlert) {
+                                Alert(
+                                    title: Text("Conferma cancellazione"),
+                                    message: Text("Sei sicuro di voler eliminare l'episodio \(episodeToDelete ?? 0)?"),
+                                    primaryButton: .destructive(Text("Elimina")) {
+                                        if let ep = episodeToDelete {
+                                            downloadManager.cancelDownload(for: ep)
+                                        }
+                                        episodeToDelete = nil
+                                    },
+                                    secondaryButton: .cancel {
+                                        episodeToDelete = nil
+                                    }
+                                )
                             }
                         }
+                        
                     } else {
                         downloadButton(for: episode)
                     }
@@ -307,19 +347,11 @@ struct DownloadManagerView: View {
                 .padding(.vertical, 8)
             }
             .listStyle(PlainListStyle())
-
+            
             HStack(spacing: 30) {
-                Button(action: { openDownloads = false }) {
-                    Image(systemName: "chevron.backward.circle")
-                        .font(.system(size: 33))
-                        .foregroundColor(.gray)
-                        .opacity(0.6)
-                }
-                .buttonStyle(BorderlessButtonStyle())
-                .help("Chiudi la vista dei download.")
-
+                
                 Spacer()
-
+                
                 Button(action: openDownloadFolder) {
                     Image(systemName: "folder.circle")
                         .font(.system(size: 33))
@@ -346,7 +378,7 @@ struct DownloadManagerView: View {
             }
         }
     }
-
+    
     @ViewBuilder
     private func downloadButton(for episode: Int) -> some View {
         Button {
@@ -361,7 +393,7 @@ struct DownloadManagerView: View {
         .buttonStyle(BorderlessButtonStyle())
         .help("Scarica episodio \(episode)")
     }
-
+    
     private func openDownloadFolder() {
         if let appSupportURL = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
             let folderURL = appSupportURL.appendingPathComponent("OnePieceDownloads")
@@ -374,7 +406,7 @@ struct DownloadManagerView: View {
             print("Impossibile trovare la directory Application Support")
         }
     }
-
+    
     private func getServerBaseURL(for episode: Int) -> String {
         switch episode {
         case 1060...: return "https://srv30.sake.streampeaker.org/DDL/ANIME/OnePiece/"
@@ -384,7 +416,7 @@ struct DownloadManagerView: View {
         default:      return "https://srv37.nezumi.streampeaker.org/DDL/ANIME/OnePiece/"
         }
     }
-
+    
     private func getVideoURL(for episode: Int) -> URL {
         let baseURL = getServerBaseURL(for: episode)
         let episodeString = String(format: "%04d", episode)
@@ -395,9 +427,24 @@ struct DownloadManagerView: View {
 
 struct VideoPlayerView: View {
     let url: URL
+    @Environment(\.dismiss) private var dismiss
+    
     var body: some View {
-        CustomVideoPlayerView(url: url, showsFullScreenToggleButton: true)
-                  .frame(minWidth: 640, minHeight: 360)
+        ZStack(alignment: .topTrailing) {
+            CustomVideoPlayerView(url: url, showsFullScreenToggleButton: true)
+                .frame(minWidth: 640, minHeight: 360)
+            
+            Button(action: {
+                dismiss()
+            }) {
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundColor(.white)
+                    .opacity(0.6)
+                    .font(.system(size: 24))
+                    .padding()
+            }
+            .buttonStyle(BorderlessButtonStyle())
+            .help("Chiudi il player")
+        }
     }
 }
-

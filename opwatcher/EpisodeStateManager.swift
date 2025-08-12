@@ -31,7 +31,7 @@ struct EpisodeStateManager {
         defaults.set(skipMixed, forKey: skipMixedKey)
         defaults.set(isFirstEpisode, forKey: isFirstEpisodeKey)
     }
-
+    
     static func load() -> (
         episode: Int,
         playbackPosition: Double,
@@ -45,7 +45,7 @@ struct EpisodeStateManager {
         let skipFiller = defaults.bool(forKey: skipFillerKey)
         let skipMixed = defaults.bool(forKey: skipMixedKey)
         let isFirstEpisode = defaults.bool(forKey: isFirstEpisodeKey)
-
+        
         return (episode, playbackPosition, skipFiller, skipMixed, isFirstEpisode)
     }
 }

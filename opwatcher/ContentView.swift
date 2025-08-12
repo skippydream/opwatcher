@@ -141,57 +141,57 @@ struct ContentView: View {
                             
                         }
                     }
-                        //Search button
-                        Button(action: {
-                            searchExpand.toggle()
-                        }) {
-                            Image(systemName: searchExpand ? "chevron.backward.circle" : "1.magnifyingglass").opacity(0.6)
-                            
-                        }.buttonStyle(.borderless).font(.system(size: 45)).padding(.horizontal)
-                            .help("Cerca un episodio.")
+                    //Search button
+                    Button(action: {
+                        searchExpand.toggle()
+                    }) {
+                        Image(systemName: searchExpand ? "chevron.backward.circle" : "1.magnifyingglass").opacity(0.6)
                         
-                        //Barra ricerca
-                        if searchExpand {
-                            VStack {
-                                TextField("Cerca...", text: $inputEpisode)
-                                    .focused($isInputFocused)
-                                    .textFieldStyle(PlainTextFieldStyle())
-                                    .font(.system(size: 25, weight: .ultraLight)).frame(maxWidth: 150)
-                                    .onSubmit {
-                                        if let episodeInt = Int(inputEpisode) {
-                                            episode = episodeInt
-                                        }
-                                        searchExpand.toggle()
-                                    }.onAppear {
-                                        isInputFocused = true
-                                        
-                                    }.onChange(of: searchExpand) { value in
-                                        if value {
-                                            isInputFocused = true
-                                        } else {
-                                            isInputFocused = false
-                                        }
+                    }.buttonStyle(.borderless).font(.system(size: 45)).padding(.horizontal)
+                        .help("Cerca un episodio.")
+                    
+                    //Barra ricerca
+                    if searchExpand {
+                        VStack {
+                            TextField("Cerca...", text: $inputEpisode)
+                                .focused($isInputFocused)
+                                .textFieldStyle(PlainTextFieldStyle())
+                                .font(.system(size: 25, weight: .ultraLight)).frame(maxWidth: 150)
+                                .onSubmit {
+                                    if let episodeInt = Int(inputEpisode) {
+                                        episode = episodeInt
                                     }
-                                Text("Scrivi il numero dell'episodio e premi invio").font(.caption)
-                            }
+                                    searchExpand.toggle()
+                                }.onAppear {
+                                    isInputFocused = true
+                                    
+                                }.onChange(of: searchExpand) { value in
+                                    if value {
+                                        isInputFocused = true
+                                    } else {
+                                        isInputFocused = false
+                                    }
+                                }
+                            Text("Scrivi il numero dell'episodio e premi invio").font(.caption)
                         }
-                        
-                        //Prossimo episodio
-                        Button(action: {
-                            incrementEpisode()
-                        }) {
-                            Image(systemName: "arrow.forward.circle.fill")
-                        }
-                        .help("Va al prossimo episodio.")
-                        
-                        .buttonStyle(.borderless)
-                        .foregroundColor(Color.gray)
-                        .font(.system(size: 80))
-                        .opacity(0.6)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding()
-                        
                     }
+                    
+                    //Prossimo episodio
+                    Button(action: {
+                        incrementEpisode()
+                    }) {
+                        Image(systemName: "arrow.forward.circle.fill")
+                    }
+                    .help("Va al prossimo episodio.")
+                    
+                    .buttonStyle(.borderless)
+                    .foregroundColor(Color.gray)
+                    .font(.system(size: 80))
+                    .opacity(0.6)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .padding()
+                    
+                }
                 .onAppear {
                     let state = EpisodeStateManager.load()
                     episode = state.episode > 0 ? state.episode : episode // evita 0 se mai salvato
@@ -210,71 +210,71 @@ struct ContentView: View {
                     )
                 }
             }
-        
+            
             
         }
         
     }
-        // Funzione per decrementare l'episodio, saltando gli episodi filler o mixed filler
-        func decrementEpisode() {
-            if !skipFiller && !skipMixed {
-                // Salta gli episodi filler e mixed filler quando si va avanti
-                repeat {
-                    episode -= 1
-                } while fillerEpisodes.contains(episode) || mixedFillerEpisodes.contains(episode)
-            } else if !skipFiller {
-                // Salta solo gli episodi filler
-                repeat {
-                    episode -= 1
-                } while fillerEpisodes.contains(episode)
-            } else if !skipMixed {
-                // Salta solo gli episodi mixed filler
-                repeat {
-                    episode -= 1
-                } while mixedFillerEpisodes.contains(episode)
-            } else {
-                // Incrementa normalmente se non si devono saltare episodi
+    // Funzione per decrementare l'episodio, saltando gli episodi filler o mixed filler
+    func decrementEpisode() {
+        if !skipFiller && !skipMixed {
+            // Salta gli episodi filler e mixed filler quando si va avanti
+            repeat {
                 episode -= 1
-            }
+            } while fillerEpisodes.contains(episode) || mixedFillerEpisodes.contains(episode)
+        } else if !skipFiller {
+            // Salta solo gli episodi filler
+            repeat {
+                episode -= 1
+            } while fillerEpisodes.contains(episode)
+        } else if !skipMixed {
+            // Salta solo gli episodi mixed filler
+            repeat {
+                episode -= 1
+            } while mixedFillerEpisodes.contains(episode)
+        } else {
+            // Incrementa normalmente se non si devono saltare episodi
+            episode -= 1
         }
-        
-        // Funzione per incrementare l'episodio, saltando gli episodi filler o mixed filler
-        func incrementEpisode() {
-            if !skipFiller && !skipMixed {
-                // Salta gli episodi filler e mixed filler quando si va avanti
-                repeat {
-                    episode += 1
-                } while fillerEpisodes.contains(episode) || mixedFillerEpisodes.contains(episode)
-            } else if !skipFiller {
-                // Salta solo gli episodi filler
-                repeat {
-                    episode += 1
-                } while fillerEpisodes.contains(episode)
-            } else if !skipMixed {
-                // Salta solo gli episodi mixed filler
-                repeat {
-                    episode += 1
-                } while mixedFillerEpisodes.contains(episode)
-            } else {
-                // Incrementa normalmente se non si devono saltare episodi
-                episode += 1
-            }
-        }
-        func lockWindowAspectRatio(for window: NSWindow) {
-            let aspectWidth: CGFloat = 600
-            let aspectHeight: CGFloat = 580
-            let aspectRatio = NSSize(width: aspectWidth, height: aspectHeight)
-            
-            window.setContentSize(aspectRatio)
-            window.aspectRatio = aspectRatio
-            
-            // (Opzionale) Limiti di resizing coerenti con l'aspect ratio
-            //window.minSize = NSSize(width: 300, height: 290)
-            //window.maxSize = NSSize(width: 1200, height: 1160)
-        }
-        
-        
     }
+    
+    // Funzione per incrementare l'episodio, saltando gli episodi filler o mixed filler
+    func incrementEpisode() {
+        if !skipFiller && !skipMixed {
+            // Salta gli episodi filler e mixed filler quando si va avanti
+            repeat {
+                episode += 1
+            } while fillerEpisodes.contains(episode) || mixedFillerEpisodes.contains(episode)
+        } else if !skipFiller {
+            // Salta solo gli episodi filler
+            repeat {
+                episode += 1
+            } while fillerEpisodes.contains(episode)
+        } else if !skipMixed {
+            // Salta solo gli episodi mixed filler
+            repeat {
+                episode += 1
+            } while mixedFillerEpisodes.contains(episode)
+        } else {
+            // Incrementa normalmente se non si devono saltare episodi
+            episode += 1
+        }
+    }
+    func lockWindowAspectRatio(for window: NSWindow) {
+        let aspectWidth: CGFloat = 600
+        let aspectHeight: CGFloat = 580
+        let aspectRatio = NSSize(width: aspectWidth, height: aspectHeight)
+        
+        window.setContentSize(aspectRatio)
+        window.aspectRatio = aspectRatio
+        
+        // (Opzionale) Limiti di resizing coerenti con l'aspect ratio
+        //window.minSize = NSSize(width: 300, height: 290)
+        //window.maxSize = NSSize(width: 1200, height: 1160)
+    }
+    
+    
+}
 
 
 struct SettingsSheetView: View {
@@ -287,7 +287,7 @@ struct SettingsSheetView: View {
         VStack(alignment: .leading, spacing: 25) {
             // Titolo e chiudi
             HStack {
-                Text("Impostazioni Episodi")
+                Text("Impostazioni")
                     .font(.system(size: 20, weight: .bold))
                 Spacer()
                 Button(action: {
@@ -311,7 +311,7 @@ struct SettingsSheetView: View {
                         .font(.headline)
                     (
                         Text("Se disattivato, salterai gli episodi ")
-                        .foregroundColor(.secondary) +
+                            .foregroundColor(.secondary) +
                         Text("Filler")
                             .bold()
                             .foregroundColor(.red)
@@ -340,7 +340,7 @@ struct SettingsSheetView: View {
                         .font(.headline)
                     (
                         Text("Se disattivato, salterai gli episodi ")
-                        .foregroundColor(.secondary) +
+                            .foregroundColor(.secondary) +
                         Text("Canon/Filler")
                             .bold()
                             .foregroundColor(.orange)
